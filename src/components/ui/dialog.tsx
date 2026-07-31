@@ -27,7 +27,7 @@ function DialogBackdrop({
     <DialogPrimitive.Backdrop
       data-slot="dialog-backdrop"
       className={cn(
-        "fixed inset-0 z-50 bg-black/70 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+        "fixed inset-0 z-50 bg-black/70 data-open:animate-in data-open:duration-200 data-open:ease-[cubic-bezier(0.16,1,0.3,1)] data-open:fade-in-0 data-closed:animate-out data-closed:duration-150 data-closed:ease-[cubic-bezier(0.4,0,1,1)] data-closed:fade-out-0",
         className
       )}
       {...props}
@@ -40,12 +40,12 @@ function DialogPopup({ className, ...props }: DialogPrimitive.Popup.Props) {
     <DialogPrimitive.Portal>
       <DialogPrimitive.Backdrop
         data-slot="dialog-backdrop"
-        className="fixed inset-0 z-50 bg-black/70 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
+        className="fixed inset-0 z-50 bg-black/70 data-open:animate-in data-open:duration-200 data-open:ease-[cubic-bezier(0.16,1,0.3,1)] data-open:fade-in-0 data-closed:animate-out data-closed:duration-150 data-closed:ease-[cubic-bezier(0.4,0,1,1)] data-closed:fade-out-0"
       />
       <DialogPrimitive.Popup
         data-slot="dialog-popup"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 flex w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 overflow-hidden rounded-none bg-popover p-4 text-popover-foreground shadow-lg ring-1 ring-foreground/10 outline-hidden duration-100 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "fixed top-1/2 left-1/2 z-50 flex w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 overflow-hidden rounded-none bg-popover p-4 text-popover-foreground shadow-lg ring-1 ring-foreground/10 outline-hidden data-open:animate-in data-open:duration-200 data-open:ease-[cubic-bezier(0.16,1,0.3,1)] data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:duration-150 data-closed:ease-[cubic-bezier(0.4,0,1,1)] data-closed:fade-out-0 data-closed:zoom-out-95",
           className
         )}
         {...props}

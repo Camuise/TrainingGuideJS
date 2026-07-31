@@ -275,7 +275,6 @@ export function CharacterDashboard({
         </div>
       </Dialog>
       <CharacterTrainingDialog
-        key={training?.name ?? "none"}
         character={training}
         onOpenChange={(nextOpen) => {
           if (!nextOpen) setTraining(null)
