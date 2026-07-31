@@ -45,7 +45,7 @@ function DialogPopup({ className, ...props }: DialogPrimitive.Popup.Props) {
       <DialogPrimitive.Popup
         data-slot="dialog-popup"
         className={cn(
-          "fixed left-1/2 top-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-none bg-popover p-4 text-popover-foreground shadow-lg ring-1 ring-foreground/10 outline-hidden duration-100 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "fixed top-1/2 left-1/2 z-50 flex w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 overflow-hidden rounded-none bg-popover p-4 text-popover-foreground shadow-lg ring-1 ring-foreground/10 outline-hidden duration-100 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className
         )}
         {...props}
@@ -54,11 +54,14 @@ function DialogPopup({ className, ...props }: DialogPrimitive.Popup.Props) {
   )
 }
 
-function DialogViewport({ className, ...props }: DialogPrimitive.Viewport.Props) {
+function DialogViewport({
+  className,
+  ...props
+}: DialogPrimitive.Viewport.Props) {
   return (
     <DialogPrimitive.Viewport
       data-slot="dialog-viewport"
-      className={cn("overflow-y-auto", className)}
+      className={cn("min-h-0 overflow-y-auto", className)}
       {...props}
     />
   )

@@ -433,7 +433,7 @@ export function CharacterTrainingDialog({
   return (
     <Dialog open onOpenChange={onOpenChange}>
       <DialogPopup className="max-h-[90svh] w-full max-w-2xl">
-        <DialogHeader>
+        <DialogHeader className="shrink-0">
           <div className="flex items-start justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3">
               <CharacterIcon
@@ -472,7 +472,7 @@ export function CharacterTrainingDialog({
             </div>
           </div>
         </DialogHeader>
-        <div className="flex flex-col gap-2.5 border border-border bg-card p-3">
+        <div className="flex shrink-0 flex-col gap-2.5 border border-border bg-card p-3">
           {TALENT_TYPES.map(({ key, type }) => (
             <TalentRangeInputs
               key={key}
@@ -505,7 +505,7 @@ export function CharacterTrainingDialog({
             />
           ))}
         </DialogViewport>
-        <DialogFooter>
+        <DialogFooter className="shrink-0">
           <Button
             type="button"
             variant="outline"
