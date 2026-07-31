@@ -1,17 +1,33 @@
 ---
 import Layout from "@/layouts/main.astro"
+import { ThemeSelector } from "@/components/theme-selector"
 import { Button } from "@/components/ui/button"
+import { Empty, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
+import { SquareOff, Plus } from "lucide-react"
 ---
 
 <Layout>
-  <div class="flex min-h-svh p-6">
-    <div class="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-      <div>
-        <h1 class="font-medium">Project ready!</h1>
-        <p>You may now add components and start building.</p>
-        <p>We've already added the button component for you.</p>
-        <Button client:load className="mt-2">Button</Button>
-      </div>
+  <div class="flex h-full min-h-svh p-6">
+    <div class="flex w-full flex-col gap-4 text-sm leading-loose">
+      <header class="flex flex-wrap items-center justify-between gap-3">
+        <h1 class="text-4xl font-bold">
+          Genshin Impact Training Guide Dashboard
+        </h1>
+        <div class="flex items-center gap-2">
+          <ThemeSelector client:load />
+          <Button variant="default" size="icon-lg">
+            <Plus className="size-8" />
+          </Button>
+        </div>
+      </header>
+      <Empty className="rounded-lg border border-border">
+        <EmptyMedia>
+          <SquareOff className="size-12 text-muted-foreground" />
+        </EmptyMedia>
+        <EmptyTitle className="text-muted-foreground">
+          No characters added
+        </EmptyTitle>
+      </Empty>
     </div>
   </div>
 </Layout>
