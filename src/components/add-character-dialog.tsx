@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Check, Search } from "lucide-react"
 
 import { CharacterIcon } from "@/components/character-icon"
@@ -22,8 +22,9 @@ interface AddCharacterDialogProps {
 }
 
 export function AddCharacterDialog({ characters }: AddCharacterDialogProps) {
-  const characterByName = new Map(
-    characters.map((character) => [character.name, character])
+  const validNames = useMemo(
+    () => new Set(characters.map((character) => character.name)),
+    [characters]
   )
   const [open, setOpen] = useState(false)
   const [added, setAdded] = useState<string[]>([])
@@ -34,14 +35,12 @@ export function AddCharacterDialog({ characters }: AddCharacterDialogProps) {
   useEffect(
     () =>
       onAddDialogOpen(() => {
-        setAdded(
-          loadAddedCharacters(new Set(characterByName.keys()))
-        )
+        setAdded(loadAddedCharacters(validNames))
         setSelected(new Set())
         setQuery("")
         setOpen(true)
       }),
-    []
+    [validNames]
   )
 
   const normalizedQuery = query.trim().toLowerCase()

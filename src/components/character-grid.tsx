@@ -28,22 +28,17 @@ export function CharacterGrid({ characters }: CharacterGridProps) {
     () => new Map(characters.map((character) => [character.name, character])),
     [characters]
   )
-  const [added, setAdded] = useState<string[]>([])
-  const [isLoaded, setIsLoaded] = useState(false)
+  const [added, setAdded] = useState<string[]>(() =>
+    loadAddedCharacters(new Set(characterByName.keys()))
+  )
   const [pendingDelete, setPendingDelete] = useState<string | null>(null)
   const [displayDeleteName, setDisplayDeleteName] = useState<string | null>(
     null
   )
 
   useEffect(() => {
-    setAdded(loadAddedCharacters(new Set(characterByName.keys())))
-    setIsLoaded(true)
-  }, [characterByName])
-
-  useEffect(() => {
-    if (!isLoaded) return
     persistAddedCharacters(added)
-  }, [added, isLoaded])
+  }, [added])
 
   useEffect(
     () =>
@@ -74,26 +69,6 @@ export function CharacterGrid({ characters }: CharacterGridProps) {
   const confirmDelete = () => {
     if (pendingDelete) removeCharacter(pendingDelete)
     setPendingDelete(null)
-  }
-
-  if (!isLoaded) {
-    return (
-      <div
-        aria-busy="true"
-        aria-label="Loading saved characters"
-        className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
-      >
-        {Array.from({ length: 6 }, (_, index) => (
-          <div
-            key={index}
-            className="flex flex-col items-center gap-2 border border-border bg-card p-3"
-          >
-            <div className="size-28 animate-pulse bg-muted" />
-            <div className="h-3 w-20 animate-pulse bg-muted" />
-          </div>
-        ))}
-      </div>
-    )
   }
 
   return (
