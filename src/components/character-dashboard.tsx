@@ -3,6 +3,7 @@ import { Check, Plus, Search, SquareOff, X } from "lucide-react"
 
 import { ThemeSelector } from "@/components/theme-selector"
 import { CharacterIcon } from "@/components/character-icon"
+import { CharacterTrainingDialog } from "@/components/character-training-dialog"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -66,6 +67,7 @@ export function CharacterDashboard({
   const [open, setOpen] = useState(false)
   const [selected, setSelected] = useState<Set<string>>(() => new Set())
   const [query, setQuery] = useState("")
+  const [training, setTraining] = useState<PlayableCharacter | null>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   const normalizedQuery = query.trim().toLowerCase()
@@ -152,15 +154,24 @@ export function CharacterDashboard({
                   key={name}
                   className="group relative flex flex-col items-center gap-2 border border-border bg-card p-3"
                 >
-                  <CharacterIcon
-                    src={character.icon}
-                    fallbackSrcs={[character.fallbackIcon, character.assetIcon]}
-                    alt={character.name}
-                    className="size-28"
-                  />
-                  <span className="text-center text-xs font-medium">
-                    {character.name}
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setTraining(character)}
+                    className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                  >
+                    <CharacterIcon
+                      src={character.icon}
+                      fallbackSrcs={[
+                        character.fallbackIcon,
+                        character.assetIcon,
+                      ]}
+                      alt={character.name}
+                      className="size-28"
+                    />
+                    <span className="text-center text-xs font-medium">
+                      {character.name}
+                    </span>
+                  </button>
                   <Button
                     type="button"
                     variant="ghost"
@@ -261,6 +272,13 @@ export function CharacterDashboard({
           </DialogFooter>
         </DialogPopup>
       </div>
+      <CharacterTrainingDialog
+        key={training?.name ?? "none"}
+        character={training}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) setTraining(null)
+        }}
+      />
     </Dialog>
   )
 }
