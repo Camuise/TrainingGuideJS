@@ -28,6 +28,12 @@ import {
 const DEFAULT_CHARACTER_RANGE = { current: "1", desired: "90" }
 const DEFAULT_TALENT_RANGE = { current: "1", desired: "10" }
 
+const TALENT_TYPES = [
+  { key: "normal", type: "Normal Attack" },
+  { key: "skill", type: "Elemental Skill" },
+  { key: "burst", type: "Elemental Burst" },
+] as const
+
 interface LevelRange {
   current: string
   desired: string
@@ -156,8 +162,46 @@ function NumberInput({
   )
 }
 
-function LevelRangeInputs({
-  label,
+function TalentIcon({
+  src,
+  name,
+  className,
+}: {
+  src: string
+  name: string
+  className?: string
+}) {
+  const [failed, setFailed] = useState(false)
+
+  if (!src || failed) {
+    return (
+      <span
+        aria-hidden
+        className={cn(
+          "flex items-center justify-center border border-border bg-muted text-muted-foreground",
+          className
+        )}
+      >
+        {name.slice(0, 1)}
+      </span>
+    )
+  }
+
+  return (
+    <img
+      src={src}
+      alt=""
+      loading="lazy"
+      onError={() => setFailed(true)}
+      className={cn("object-contain", className)}
+    />
+  )
+}
+
+function TalentRangeInputs({
+  icon,
+  type,
+  name,
   current,
   desired,
   min,
@@ -165,7 +209,9 @@ function LevelRangeInputs({
   onCurrent,
   onDesired,
 }: {
-  label: string
+  icon: string
+  type: string
+  name: string
   current: string
   desired: string
   min: number
@@ -175,14 +221,22 @@ function LevelRangeInputs({
 }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="min-w-0 truncate text-xs font-medium">{label}</span>
+      <div className="flex min-w-0 items-center gap-2">
+        <TalentIcon src={icon} name={name} className="size-7 shrink-0" />
+        <div className="flex min-w-0 flex-col">
+          <span className="truncate text-xs font-medium">{type}</span>
+          <span className="truncate text-[10px] text-muted-foreground">
+            {name}
+          </span>
+        </div>
+      </div>
       <div className="flex shrink-0 items-center gap-2">
         <NumberInput
           value={current}
           min={min}
           max={max}
           onChange={onCurrent}
-          ariaLabel={`${label} current level`}
+          ariaLabel={`${name} current level`}
         />
         <span className="text-xs text-muted-foreground">→</span>
         <NumberInput
@@ -190,7 +244,7 @@ function LevelRangeInputs({
           min={min}
           max={max}
           onChange={onDesired}
-          ariaLabel={`${label} desired level`}
+          ariaLabel={`${name} desired level`}
         />
       </div>
     </div>
@@ -280,11 +334,13 @@ function CharacterSection({
 }
 
 function TalentSection({
+  type,
   label,
   costs,
   current,
   desired,
 }: {
+  type: string
   label: string
   costs: MaterialAmount[][]
   current: number
@@ -302,7 +358,7 @@ function TalentSection({
     <section className="flex flex-col gap-3">
       <div className="flex flex-col gap-1">
         <h2 className="font-heading text-base font-medium">
-          {label} (Lv. {current} → {desired})
+          {type} · {label} (Lv. {current} → {desired})
         </h2>
       </div>
       <div className="flex flex-wrap gap-1.5">
@@ -362,11 +418,6 @@ export function CharacterTrainingDialog({
     1,
     90
   )
-  const talentKeys: ("normal" | "skill" | "burst")[] = [
-    "normal",
-    "skill",
-    "burst",
-  ]
 
   const updateCharacterRange = (key: keyof LevelRange) => (value: string) =>
     setCharacterRange((prev) => ({ ...prev, [key]: value }))
@@ -383,42 +434,57 @@ export function CharacterTrainingDialog({
     <Dialog open onOpenChange={onOpenChange}>
       <DialogPopup className="max-h-[90svh] w-full max-w-2xl">
         <DialogHeader>
-          <div className="flex items-center gap-3">
-            <CharacterIcon
-              src={character.icon}
-              fallbackSrcs={[character.fallbackIcon, character.assetIcon]}
-              alt={character.name}
-              className="size-14"
-            />
-            <div className="flex min-w-0 flex-col">
-              <DialogTitle>{character.name}</DialogTitle>
-              <DialogDescription className="line-clamp-2">
-                {character.talentNames.normal} · {character.talentNames.skill} ·{" "}
-                {character.talentNames.burst}
-              </DialogDescription>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex min-w-0 items-center gap-3">
+              <CharacterIcon
+                src={character.icon}
+                fallbackSrcs={[character.fallbackIcon, character.assetIcon]}
+                alt={character.name}
+                className="size-14 shrink-0"
+              />
+              <div className="flex min-w-0 flex-col">
+                <DialogTitle>{character.name}</DialogTitle>
+                <DialogDescription className="line-clamp-2">
+                  {character.talentNames.normal} · {character.talentNames.skill}{" "}
+                  · {character.talentNames.burst}
+                </DialogDescription>
+              </div>
+            </div>
+            <div className="flex shrink-0 flex-col items-end gap-1">
+              <span className="text-xs font-medium">Character Level</span>
+              <div className="flex items-center gap-2">
+                <NumberInput
+                  value={characterRange.current}
+                  min={1}
+                  max={90}
+                  onChange={updateCharacterRange("current")}
+                  ariaLabel="Character Level current level"
+                />
+                <span className="text-xs text-muted-foreground">→</span>
+                <NumberInput
+                  value={characterRange.desired}
+                  min={1}
+                  max={90}
+                  onChange={updateCharacterRange("desired")}
+                  ariaLabel="Character Level desired level"
+                />
+              </div>
             </div>
           </div>
         </DialogHeader>
         <div className="flex flex-col gap-2.5 border border-border bg-card p-3">
-          <LevelRangeInputs
-            label="Character Level"
-            current={characterRange.current}
-            desired={characterRange.desired}
-            min={1}
-            max={90}
-            onCurrent={updateCharacterRange("current")}
-            onDesired={updateCharacterRange("desired")}
-          />
-          {talentKeys.map((talent) => (
-            <LevelRangeInputs
-              key={talent}
-              label={character.talentNames[talent]}
-              current={talentRanges[talent].current}
-              desired={talentRanges[talent].desired}
+          {TALENT_TYPES.map(({ key, type }) => (
+            <TalentRangeInputs
+              key={key}
+              icon={character.talentIcons[key]}
+              type={type}
+              name={character.talentNames[key]}
+              current={talentRanges[key].current}
+              desired={talentRanges[key].desired}
               min={1}
               max={10}
-              onCurrent={updateTalentRange(talent)("current")}
-              onDesired={updateTalentRange(talent)("desired")}
+              onCurrent={updateTalentRange(key)("current")}
+              onDesired={updateTalentRange(key)("desired")}
             />
           ))}
         </div>
@@ -428,21 +494,14 @@ export function CharacterTrainingDialog({
             current={currentCharacterLevel}
             desired={desiredCharacterLevel}
           />
-          {talentKeys.map((talent) => (
+          {TALENT_TYPES.map(({ key, type }) => (
             <TalentSection
-              key={talent}
-              label={character.talentNames[talent]}
+              key={key}
+              type={type}
+              label={character.talentNames[key]}
               costs={character.talentCosts}
-              current={clamp(
-                parseLevel(talentRanges[talent].current, 1),
-                1,
-                10
-              )}
-              desired={clamp(
-                parseLevel(talentRanges[talent].desired, 10),
-                1,
-                10
-              )}
+              current={clamp(parseLevel(talentRanges[key].current, 1), 1, 10)}
+              desired={clamp(parseLevel(talentRanges[key].desired, 10), 1, 10)}
             />
           ))}
         </DialogViewport>

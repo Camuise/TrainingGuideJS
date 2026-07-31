@@ -119,6 +119,11 @@ export interface PlayableCharacter {
     skill: string
     burst: string
   }
+  talentIcons: {
+    normal: string
+    skill: string
+    burst: string
+  }
 }
 
 export const materialIcons: Record<string, string> = {}
@@ -159,6 +164,17 @@ export const playableCharacters: PlayableCharacter[] = genshin
         normal: talents?.combat1?.name ?? "Normal Attack",
         skill: talents?.combat2?.name ?? "Elemental Skill",
         burst: talents?.combat3?.name ?? "Elemental Burst",
+      },
+      talentIcons: {
+        normal: talents?.images?.filename_combat1
+          ? `https://enka.network/ui/${talents.images.filename_combat1}.png`
+          : "",
+        skill: talents?.images?.filename_combat2
+          ? `https://enka.network/ui/${talents.images.filename_combat2}.png`
+          : "",
+        burst: talents?.images?.filename_combat3
+          ? `https://enka.network/ui/${talents.images.filename_combat3}.png`
+          : "",
       },
     }
   })
