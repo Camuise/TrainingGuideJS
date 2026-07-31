@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react"
-import { Check, Plus, Search, SquareOff, X } from "lucide-react"
+import { Check, Plus, Search, SquareOff, Trash2 } from "lucide-react"
 
 import { ThemeSelector } from "@/components/theme-selector"
 import { CharacterIcon } from "@/components/character-icon"
@@ -67,6 +67,7 @@ export function CharacterDashboard({
   const [selected, setSelected] = useState<Set<string>>(() => new Set())
   const [query, setQuery] = useState("")
   const [training, setTraining] = useState<PlayableCharacter | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<string | null>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -195,13 +196,13 @@ export function CharacterDashboard({
                     </button>
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant="destructive"
                       size="icon-xs"
                       className="absolute top-1 right-1 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
                       aria-label={`Remove ${character.name}`}
-                      onClick={() => removeCharacter(name)}
+                      onClick={() => setPendingDelete(name)}
                     >
-                      <X className="size-3" />
+                      <Trash2 className="size-3" />
                     </Button>
                   </div>
                 )
@@ -300,6 +301,44 @@ export function CharacterDashboard({
           if (!nextOpen) setTraining(null)
         }}
       />
+      <Dialog
+        open={pendingDelete !== null}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) setPendingDelete(null)
+        }}
+      >
+        <DialogPopup className="w-full max-w-sm">
+          <DialogHeader>
+            <DialogTitle>
+              Remove {pendingDelete ? `"${pendingDelete}"` : "character"}?
+            </DialogTitle>
+            <DialogDescription>
+              This will remove the character from your training guide. Your
+              saved progress for it will be lost.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPendingDelete(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => {
+                if (pendingDelete) removeCharacter(pendingDelete)
+                setPendingDelete(null)
+              }}
+            >
+              <Trash2 className="size-4" />
+              Remove
+            </Button>
+          </DialogFooter>
+        </DialogPopup>
+      </Dialog>
     </>
   )
 }
