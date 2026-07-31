@@ -2,12 +2,80 @@
 import "@/styles/global.css"
 ---
 
-<html lang="en">
+<html lang="en" class="dark" style="color-scheme: dark;">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>Astro App</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <title>Training Guide</title>
+    <script is:inline>
+      const storageKey = "theme"
+      const root = document.documentElement
+
+      const getStoredTheme = () => {
+        try {
+          return localStorage.getItem(storageKey) || "dark"
+        } catch {
+          return "dark"
+        }
+      }
+
+      const getSystemTheme = () =>
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light"
+
+      const applyTheme = (theme) => {
+        const resolvedTheme = theme === "system" ? getSystemTheme() : theme
+        root.classList.toggle("dark", resolvedTheme === "dark")
+        root.classList.toggle("light", resolvedTheme === "light")
+        root.style.colorScheme = resolvedTheme
+        root.dataset.theme = theme
+      }
+
+      const updateThemeButtons = (theme) => {
+        const selectedTheme = theme === "system" ? "system" : theme
+        document.querySelectorAll("[data-theme-option]").forEach((button) => {
+          const isActive =
+            button.getAttribute("data-theme-option") === selectedTheme
+          button.classList.toggle("bg-primary", isActive)
+          button.classList.toggle("text-primary-foreground", isActive)
+          button.classList.toggle("hover:bg-primary/80", isActive)
+          button.classList.toggle("text-foreground", !isActive)
+          button.classList.toggle("hover:bg-muted", !isActive)
+          button.setAttribute("aria-pressed", isActive ? "true" : "false")
+        })
+      }
+
+      const setTheme = (theme) => {
+        try {
+          localStorage.setItem(storageKey, theme)
+        } catch {
+          // Ignore storage errors and keep the current session theme.
+        }
+        applyTheme(theme)
+        updateThemeButtons(theme)
+        document.dispatchEvent(new Event("themechange"))
+      }
+
+      window.applyTheme = applyTheme
+      window.setTheme = setTheme
+
+      applyTheme(getStoredTheme())
+      updateThemeButtons(getStoredTheme())
+
+      document.addEventListener("DOMContentLoaded", () => {
+        updateThemeButtons(getStoredTheme())
+      })
+
+      window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .addEventListener("change", () => {
+          if (getStoredTheme() === "system") {
+            applyTheme("system")
+          }
+        })
+    </script>
   </head>
   <body>
     <slot />
