@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Check, Plus, Search, SquareOff, X } from "lucide-react"
 
 import { ThemeSelector } from "@/components/theme-selector"
@@ -61,14 +61,18 @@ export function CharacterDashboard({
     () => new Map(characters.map((character) => [character.name, character])),
     [characters]
   )
-  const [added, setAdded] = useState<string[]>(() =>
-    loadAddedCharacters(new Set(characterByName.keys()))
-  )
+  const [added, setAdded] = useState<string[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [open, setOpen] = useState(false)
   const [selected, setSelected] = useState<Set<string>>(() => new Set())
   const [query, setQuery] = useState("")
   const [training, setTraining] = useState<PlayableCharacter | null>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    setAdded(loadAddedCharacters(new Set(characterByName.keys())))
+    setIsLoading(false)
+  }, [characterByName])
 
   const normalizedQuery = query.trim().toLowerCase()
   const filteredCharacters =
@@ -136,7 +140,23 @@ export function CharacterDashboard({
             </div>
           </header>
 
-          {added.length === 0 ? (
+          {isLoading ? (
+            <div
+              aria-busy="true"
+              aria-label="Loading saved characters"
+              className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+            >
+              {Array.from({ length: 6 }, (_, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col items-center gap-2 border border-border bg-card p-3"
+                >
+                  <div className="size-28 animate-pulse bg-muted" />
+                  <div className="h-3 w-20 animate-pulse bg-muted" />
+                </div>
+              ))}
+            </div>
+          ) : added.length === 0 ? (
             <Empty className="rounded-lg border border-border">
               <EmptyMedia>
                 <SquareOff className="size-12 text-muted-foreground" />
