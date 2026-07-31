@@ -68,6 +68,9 @@ export function CharacterDashboard({
   const [query, setQuery] = useState("")
   const [training, setTraining] = useState<PlayableCharacter | null>(null)
   const [pendingDelete, setPendingDelete] = useState<string | null>(null)
+  const [displayDeleteName, setDisplayDeleteName] = useState<string | null>(
+    null
+  )
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -110,6 +113,18 @@ export function CharacterDashboard({
     const next = added.filter((addedName) => addedName !== name)
     setAdded(next)
     persistAddedCharacters(next)
+  }
+
+  const requestDelete = (name: string) => {
+    setDisplayDeleteName(name)
+    setPendingDelete(name)
+  }
+
+  const closeDeleteDialog = () => setPendingDelete(null)
+
+  const confirmDelete = () => {
+    if (pendingDelete) removeCharacter(pendingDelete)
+    setPendingDelete(null)
   }
 
   return (
@@ -200,7 +215,7 @@ export function CharacterDashboard({
                       size="icon-xs"
                       className="absolute top-1 right-1 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
                       aria-label={`Remove ${character.name}`}
-                      onClick={() => setPendingDelete(name)}
+                      onClick={() => requestDelete(name)}
                     >
                       <Trash2 className="size-3" />
                     </Button>
@@ -310,7 +325,8 @@ export function CharacterDashboard({
         <DialogPopup className="w-full max-w-sm">
           <DialogHeader>
             <DialogTitle>
-              Remove {pendingDelete ? `"${pendingDelete}"` : "character"}?
+              Remove &quot;{pendingDelete ?? displayDeleteName ?? "character"}
+              &quot;?
             </DialogTitle>
             <DialogDescription>
               This will remove the character from your training guide. Your
@@ -318,21 +334,10 @@ export function CharacterDashboard({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setPendingDelete(null)}
-            >
+            <Button type="button" variant="outline" onClick={closeDeleteDialog}>
               Cancel
             </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={() => {
-                if (pendingDelete) removeCharacter(pendingDelete)
-                setPendingDelete(null)
-              }}
-            >
+            <Button type="button" variant="destructive" onClick={confirmDelete}>
               <Trash2 className="size-4" />
               Remove
             </Button>
