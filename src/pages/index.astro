@@ -1,15 +1,27 @@
 ---
 import Layout from "@/layouts/main.astro"
-import { CharacterDashboard } from "@/components/character-dashboard"
+import { AddCharacterButton } from "@/components/add-character-button"
+import { AddCharacterDialog } from "@/components/add-character-dialog"
+import { CharacterGrid } from "@/components/character-grid"
+import { ThemeSelector } from "@/components/theme-selector"
+import { TrainingDialog } from "@/components/training-dialog"
 import { playableCharacters } from "@/lib/playable-characters"
 ---
 
 <Layout>
   <div class="flex h-full min-h-svh p-6">
-    <CharacterDashboard
-      title="Genshin Impact Training Guide Dashboard"
-      characters={playableCharacters}
-      client:load
-    />
+    <div class="flex w-full flex-col gap-4 text-sm leading-loose">
+      <header class="flex flex-wrap items-center justify-between gap-3">
+        <h1 class="text-4xl font-bold">Training Guide Dashboard</h1>
+        <div class="flex items-center gap-2">
+          <ThemeSelector client:load />
+          <AddCharacterButton client:load />
+        </div>
+      </header>
+
+      <CharacterGrid characters={playableCharacters} client:load />
+      <AddCharacterDialog characters={playableCharacters} client:load />
+      <TrainingDialog characters={playableCharacters} client:load />
+    </div>
   </div>
 </Layout>
