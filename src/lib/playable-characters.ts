@@ -109,6 +109,7 @@ export interface MaterialAmount {
 
 export interface PlayableCharacter {
   name: string
+  element: string
   icon: string
   fallbackIcon: string
   assetIcon: string
@@ -149,6 +150,7 @@ export const playableCharacters: PlayableCharacter[] = genshin
 
     return {
       name: character?.name ?? name,
+      element: character?.elementText ?? "",
       icon: character?.images.mihoyo_icon ?? "",
       fallbackIcon: character?.images.hoyowiki_icon ?? "",
       assetIcon: character

@@ -31,6 +31,13 @@
     --chart-4: oklch(0.491 0.27 292.581);
     --chart-5: oklch(0.432 0.232 292.759);
     --radius: 0.625rem;
+    --element-anemo: #73d7ff;
+    --element-cryo: #a9e4f5;
+    --element-dendro: #9ac437;
+    --element-electro: #c87ef4;
+    --element-geo: #ffd45c;
+    --element-hydro: #4fc2f7;
+    --element-pyro: #ff6b4a;
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0.008 326);
     --sidebar-primary: oklch(0.541 0.281 293.009);
@@ -92,6 +99,13 @@
     --color-chart-2: var(--chart-2);
     --color-chart-1: var(--chart-1);
     --color-ring: var(--ring);
+    --color-element-anemo: var(--element-anemo);
+    --color-element-cryo: var(--element-cryo);
+    --color-element-dendro: var(--element-dendro);
+    --color-element-electro: var(--element-electro);
+    --color-element-geo: var(--element-geo);
+    --color-element-hydro: var(--element-hydro);
+    --color-element-pyro: var(--element-pyro);
     --color-input: var(--input);
     --color-border: var(--border);
     --color-destructive: var(--destructive);
