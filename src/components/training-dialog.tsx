@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react"
+import { Gem, TrendingUp, Zap } from "lucide-react"
 
 import { CharacterIcon } from "@/components/character-icon"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Dialog,
   DialogDescription,
@@ -35,6 +38,87 @@ const TALENT_TYPES = [
   { key: "burst", type: "Elemental Burst" },
 ] as const
 
+interface AccentClasses {
+  text: string
+  border: string
+  ringSoft: string
+  bgSoft: string
+  bgSoftest: string
+  bar: string
+}
+
+const ELEMENT_ACCENTS: Record<string, AccentClasses> = {
+  Anemo: {
+    text: "text-element-anemo",
+    border: "border-element-anemo",
+    ringSoft: "ring-element-anemo/40",
+    bgSoft: "bg-element-anemo/10",
+    bgSoftest: "bg-element-anemo/5",
+    bar: "bg-element-anemo",
+  },
+  Cryo: {
+    text: "text-element-cryo",
+    border: "border-element-cryo",
+    ringSoft: "ring-element-cryo/40",
+    bgSoft: "bg-element-cryo/10",
+    bgSoftest: "bg-element-cryo/5",
+    bar: "bg-element-cryo",
+  },
+  Dendro: {
+    text: "text-element-dendro",
+    border: "border-element-dendro",
+    ringSoft: "ring-element-dendro/40",
+    bgSoft: "bg-element-dendro/10",
+    bgSoftest: "bg-element-dendro/5",
+    bar: "bg-element-dendro",
+  },
+  Electro: {
+    text: "text-element-electro",
+    border: "border-element-electro",
+    ringSoft: "ring-element-electro/40",
+    bgSoft: "bg-element-electro/10",
+    bgSoftest: "bg-element-electro/5",
+    bar: "bg-element-electro",
+  },
+  Geo: {
+    text: "text-element-geo",
+    border: "border-element-geo",
+    ringSoft: "ring-element-geo/40",
+    bgSoft: "bg-element-geo/10",
+    bgSoftest: "bg-element-geo/5",
+    bar: "bg-element-geo",
+  },
+  Hydro: {
+    text: "text-element-hydro",
+    border: "border-element-hydro",
+    ringSoft: "ring-element-hydro/40",
+    bgSoft: "bg-element-hydro/10",
+    bgSoftest: "bg-element-hydro/5",
+    bar: "bg-element-hydro",
+  },
+  Pyro: {
+    text: "text-element-pyro",
+    border: "border-element-pyro",
+    ringSoft: "ring-element-pyro/40",
+    bgSoft: "bg-element-pyro/10",
+    bgSoftest: "bg-element-pyro/5",
+    bar: "bg-element-pyro",
+  },
+}
+
+const DEFAULT_ACCENT: AccentClasses = {
+  text: "text-primary",
+  border: "border-primary",
+  ringSoft: "ring-primary/40",
+  bgSoft: "bg-primary/10",
+  bgSoftest: "bg-primary/5",
+  bar: "bg-primary",
+}
+
+function accentFor(element: string): AccentClasses {
+  return ELEMENT_ACCENTS[element] ?? DEFAULT_ACCENT
+}
+
 interface LevelRange {
   current: string
   desired: string
@@ -61,15 +145,16 @@ function MaterialIcon({
 
   if (!src || failed) {
     return (
-      <span
+      <Badge
         aria-hidden
+        variant="outline"
         className={cn(
-          "flex items-center justify-center border border-border bg-muted text-muted-foreground",
+          "justify-center bg-muted p-0 text-muted-foreground",
           className
         )}
       >
         {name.slice(0, 1)}
-      </span>
+      </Badge>
     )
   }
 
@@ -87,30 +172,33 @@ function MaterialIcon({
 function MaterialChips({
   materials,
   size = "md",
+  className,
 }: {
   materials: MaterialAmount[]
   size?: "sm" | "md"
+  className?: string
 }) {
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div className={cn("flex flex-wrap gap-1.5", className)}>
       {materials.map((material) => (
-        <span
+        <Badge
           key={material.name}
+          variant="outline"
           title={material.name}
-          className="flex items-center gap-1 border border-border bg-background px-1.5 py-1 text-xs text-muted-foreground"
+          className="gap-1 bg-background px-1.5 py-1 text-muted-foreground"
         >
           <MaterialIcon
             name={material.name}
             className={size === "sm" ? "size-4" : "size-5"}
           />
           {material.count.toLocaleString()}
-        </span>
+        </Badge>
       ))}
     </div>
   )
 }
 
-function SummaryChip({
+function SummaryItem({
   children,
   highlight = false,
   title,
@@ -123,12 +211,20 @@ function SummaryChip({
     <span
       title={title}
       className={cn(
-        "flex items-center gap-1 border border-border bg-background px-2 py-1 text-xs",
-        highlight && "border-primary text-foreground"
+        "flex items-center gap-1.5 bg-background px-2 py-1.5 text-xs text-muted-foreground",
+        highlight && "text-foreground"
       )}
     >
       {children}
     </span>
+  )
+}
+
+function SummaryStrip({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex flex-wrap gap-px overflow-hidden border border-border bg-border">
+      {children}
+    </div>
   )
 }
 
@@ -176,15 +272,16 @@ function TalentIcon({
 
   if (!src || failed) {
     return (
-      <span
+      <Badge
         aria-hidden
+        variant="outline"
         className={cn(
-          "flex items-center justify-center border border-border bg-muted text-muted-foreground",
+          "justify-center bg-muted p-0 text-muted-foreground",
           className
         )}
       >
         {name.slice(0, 1)}
-      </span>
+      </Badge>
     )
   }
 
@@ -269,15 +366,18 @@ function CharacterSection({
     [character, current, desired]
   )
 
+  const accent = accentFor(character.element)
+
   return (
     <section className="flex flex-col gap-3">
-      <div className="flex flex-col gap-1">
-        <h2 className="font-heading text-base font-medium">
-          Character Level (Lv. {current} → {desired})
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="flex items-center gap-2 font-heading text-base font-medium">
+          <TrendingUp className={cn("size-4", accent.text)} />
+          Character Level
         </h2>
-        <p className="text-xs text-muted-foreground">
-          EXP to level, plus ascension materials at each ascension gate.
-        </p>
+        <span className="shrink-0 text-xs text-muted-foreground">
+          Lv. {current} → {desired}
+        </span>
       </div>
       {!plan ? (
         <p className="text-xs text-muted-foreground">
@@ -285,49 +385,91 @@ function CharacterSection({
         </p>
       ) : (
         <>
-          <div className="flex flex-wrap gap-1.5">
-            <SummaryChip highlight>
-              {plan.totalExp.toLocaleString()} EXP
-            </SummaryChip>
-            <SummaryChip>
-              ≈ {Math.ceil(plan.totalExp / EXP_PER_HERO_WIT)} Hero&apos;s Wit
-            </SummaryChip>
+          <SummaryStrip>
+            <SummaryItem highlight>
+              <span className="font-medium">
+                {plan.totalExp.toLocaleString()}
+              </span>
+              EXP
+            </SummaryItem>
+            <SummaryItem title="Hero's Wit">
+              <MaterialIcon name="Hero's Wit" className="size-4" />≈{" "}
+              {Math.ceil(plan.totalExp / EXP_PER_HERO_WIT)}
+            </SummaryItem>
             {plan.totalMaterials.map((material) => (
-              <SummaryChip key={material.name} title={material.name}>
+              <SummaryItem key={material.name} title={material.name}>
                 <MaterialIcon name={material.name} className="size-4" />
                 {material.count.toLocaleString()}
-              </SummaryChip>
+              </SummaryItem>
             ))}
-          </div>
-          <div className="flex flex-col divide-y divide-border border border-border">
-            {plan.steps.map((step, index) =>
-              step.kind === "exp" ? (
-                <div
+          </SummaryStrip>
+          <ol className="flex flex-col">
+            {plan.steps.map((step, index) => {
+              const isLast = index === plan.steps.length - 1
+              const isAscension = step.kind === "ascension"
+              return (
+                <li
                   key={index}
-                  className="flex items-center justify-between gap-2 px-3 py-2"
+                  className={cn("relative flex gap-3", !isLast && "pb-3")}
                 >
-                  <span className="text-xs">
-                    EXP{" "}
-                    <span className="font-medium">
-                      {step.from} → {step.to}
-                    </span>
+                  {!isLast && (
+                    <span
+                      aria-hidden
+                      className="absolute top-7 bottom-0 left-3.5 w-px bg-border"
+                    />
+                  )}
+                  <span
+                    className={cn(
+                      "z-10 flex size-7 shrink-0 items-center justify-center border",
+                      isAscension
+                        ? cn(accent.border, accent.bgSoft, accent.text)
+                        : "border-border bg-card text-muted-foreground"
+                    )}
+                  >
+                    {isAscension ? (
+                      <Gem className="size-3.5" />
+                    ) : (
+                      <Zap className="size-3.5" />
+                    )}
                   </span>
-                  <span className="text-xs text-muted-foreground">
-                    {step.exp.toLocaleString()} EXP
-                  </span>
-                </div>
-              ) : (
-                <div key={index} className="flex flex-col gap-1.5 px-3 py-2">
-                  <span className="text-xs">
-                    Ascend at{" "}
-                    <span className="font-medium">Lv. {step.level}</span> (
-                    {step.label})
-                  </span>
-                  <MaterialChips materials={step.materials} />
-                </div>
+                  {isAscension ? (
+                    <Card
+                      size="sm"
+                      className={cn(
+                        "min-w-0 flex-1",
+                        accent.ringSoft,
+                        accent.bgSoftest
+                      )}
+                    >
+                      <CardContent className="flex flex-col gap-1.5">
+                        <span className="flex items-center gap-1.5 text-xs">
+                          <span className="font-medium">{step.label}</span>
+                          <span className="text-muted-foreground">
+                            at Lv. {step.level}
+                          </span>
+                        </span>
+                        <MaterialChips materials={step.materials} size="sm" />
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="flex min-h-7 min-w-0 flex-1 items-center">
+                      <div className="flex w-full items-center justify-between gap-2">
+                        <span className="text-xs">
+                          EXP{" "}
+                          <span className="font-medium">
+                            {step.from} → {step.to}
+                          </span>
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {step.exp.toLocaleString()} EXP
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </li>
               )
-            )}
-          </div>
+            })}
+          </ol>
         </>
       )}
     </section>
@@ -337,12 +479,14 @@ function CharacterSection({
 function TalentSection({
   type,
   label,
+  icon,
   costs,
   current,
   desired,
 }: {
   type: string
   label: string
+  icon: string
   costs: MaterialAmount[][]
   current: number
   desired: number
@@ -357,30 +501,45 @@ function TalentSection({
 
   return (
     <section className="flex flex-col gap-3">
-      <div className="flex flex-col gap-1">
-        <h2 className="font-heading text-base font-medium">
-          {type} · {label} (Lv. {current} → {desired})
-        </h2>
-      </div>
-      <div className="flex flex-wrap gap-1.5">
-        {plan.totalMaterials.map((material) => (
-          <SummaryChip key={material.name} title={material.name}>
-            <MaterialIcon name={material.name} className="size-4" />
-            {material.count.toLocaleString()}
-          </SummaryChip>
-        ))}
-      </div>
-      <div className="flex flex-col divide-y divide-border border border-border">
-        {plan.steps.map((step, index) => (
-          <div key={index} className="flex flex-col gap-1.5 px-3 py-2">
-            <span className="text-xs">
-              Lv.{" "}
-              <span className="font-medium">
-                {step.from} → {step.to}
-              </span>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <TalentIcon src={icon} name={label} className="size-6 shrink-0" />
+          <div className="flex min-w-0 flex-col">
+            <h2 className="truncate font-heading text-base font-medium">
+              {type}
+            </h2>
+            <span className="truncate text-[10px] text-muted-foreground">
+              {label}
             </span>
-            <MaterialChips materials={step.materials} size="sm" />
           </div>
+        </div>
+        <span className="shrink-0 text-xs text-muted-foreground">
+          Lv. {current} → {desired}
+        </span>
+      </div>
+      {plan.totalMaterials.length > 0 && (
+        <SummaryStrip>
+          {plan.totalMaterials.map((material) => (
+            <SummaryItem key={material.name} title={material.name}>
+              <MaterialIcon name={material.name} className="size-4" />
+              {material.count.toLocaleString()}
+            </SummaryItem>
+          ))}
+        </SummaryStrip>
+      )}
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {plan.steps.map((step, index) => (
+          <Card key={index} size="sm" className="gap-1.5">
+            <CardContent className="flex flex-col gap-1.5">
+              <span className="flex items-center justify-between gap-1 text-xs">
+                <span className="text-muted-foreground">Lv.</span>
+                <span className="font-medium">
+                  {step.from} → {step.to}
+                </span>
+              </span>
+              <MaterialChips materials={step.materials} size="sm" />
+            </CardContent>
+          </Card>
         ))}
       </div>
     </section>
@@ -458,6 +617,8 @@ export function TrainingDialog({ characters }: TrainingDialogProps) {
         [talent]: { ...prev[talent], [key]: value },
       }))
 
+  const accent = accentFor(currentCharacter.element)
+
   return (
     <Dialog
       open={open}
@@ -467,65 +628,87 @@ export function TrainingDialog({ characters }: TrainingDialogProps) {
       }}
     >
       <DialogPopup className="max-h-[90svh] w-full max-w-2xl">
-        <DialogHeader className="shrink-0">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex min-w-0 items-center gap-3">
+        <Card className="relative shrink-0 overflow-hidden">
+          <DialogHeader className="px-(--card-spacing)">
+            <span
+              aria-hidden
+              className={cn("absolute inset-x-0 top-0 h-1", accent.bar)}
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -right-3 -bottom-5 size-28"
+            >
               <CharacterIcon
                 src={currentCharacter.icon}
                 fallbackSrcs={[
                   currentCharacter.fallbackIcon,
                   currentCharacter.assetIcon,
                 ]}
-                alt={currentCharacter.name}
-                className="size-14 shrink-0"
+                alt=""
+                className="size-28 -scale-x-100 object-contain opacity-10"
               />
-              <div className="flex min-w-0 flex-col">
-                <DialogTitle>{currentCharacter.name}</DialogTitle>
-                <DialogDescription className="line-clamp-2">
-                  {currentCharacter.talentNames.normal} ·{" "}
-                  {currentCharacter.talentNames.skill} ·{" "}
-                  {currentCharacter.talentNames.burst}
-                </DialogDescription>
+            </div>
+            <div className="relative flex items-start justify-between gap-4">
+              <div className="flex min-w-0 items-center gap-3">
+                <CharacterIcon
+                  src={currentCharacter.icon}
+                  fallbackSrcs={[
+                    currentCharacter.fallbackIcon,
+                    currentCharacter.assetIcon,
+                  ]}
+                  alt={currentCharacter.name}
+                  className="size-14 shrink-0"
+                />
+                <div className="flex min-w-0 flex-col">
+                  <DialogTitle>{currentCharacter.name}</DialogTitle>
+                  <DialogDescription className="line-clamp-2">
+                    {currentCharacter.talentNames.normal} ·{" "}
+                    {currentCharacter.talentNames.skill} ·{" "}
+                    {currentCharacter.talentNames.burst}
+                  </DialogDescription>
+                </div>
+              </div>
+              <div className="flex shrink-0 flex-col items-end gap-1">
+                <span className="text-xs font-medium">Character Level</span>
+                <div className="flex items-center gap-2">
+                  <NumberInput
+                    value={characterRange.current}
+                    min={1}
+                    max={90}
+                    onChange={updateCharacterRange("current")}
+                    ariaLabel="Character Level current level"
+                  />
+                  <span className="text-xs text-muted-foreground">→</span>
+                  <NumberInput
+                    value={characterRange.desired}
+                    min={1}
+                    max={90}
+                    onChange={updateCharacterRange("desired")}
+                    ariaLabel="Character Level desired level"
+                  />
+                </div>
               </div>
             </div>
-            <div className="flex shrink-0 flex-col items-end gap-1">
-              <span className="text-xs font-medium">Character Level</span>
-              <div className="flex items-center gap-2">
-                <NumberInput
-                  value={characterRange.current}
-                  min={1}
-                  max={90}
-                  onChange={updateCharacterRange("current")}
-                  ariaLabel="Character Level current level"
-                />
-                <span className="text-xs text-muted-foreground">→</span>
-                <NumberInput
-                  value={characterRange.desired}
-                  min={1}
-                  max={90}
-                  onChange={updateCharacterRange("desired")}
-                  ariaLabel="Character Level desired level"
-                />
-              </div>
-            </div>
-          </div>
-        </DialogHeader>
-        <div className="flex shrink-0 flex-col gap-2.5 border border-border bg-card p-3">
-          {TALENT_TYPES.map(({ key, type }) => (
-            <TalentRangeInputs
-              key={key}
-              icon={currentCharacter.talentIcons[key]}
-              type={type}
-              name={currentCharacter.talentNames[key]}
-              current={talentRanges[key].current}
-              desired={talentRanges[key].desired}
-              min={1}
-              max={10}
-              onCurrent={updateTalentRange(key)("current")}
-              onDesired={updateTalentRange(key)("desired")}
-            />
-          ))}
-        </div>
+          </DialogHeader>
+        </Card>
+        <Card size="sm" className="shrink-0">
+          <CardContent className="flex flex-col gap-2.5">
+            {TALENT_TYPES.map(({ key, type }) => (
+              <TalentRangeInputs
+                key={key}
+                icon={currentCharacter.talentIcons[key]}
+                type={type}
+                name={currentCharacter.talentNames[key]}
+                current={talentRanges[key].current}
+                desired={talentRanges[key].desired}
+                min={1}
+                max={10}
+                onCurrent={updateTalentRange(key)("current")}
+                onDesired={updateTalentRange(key)("desired")}
+              />
+            ))}
+          </CardContent>
+        </Card>
         <DialogViewport className="flex flex-col gap-6 pr-1">
           <CharacterSection
             character={currentCharacter}
@@ -537,13 +720,10 @@ export function TrainingDialog({ characters }: TrainingDialogProps) {
               key={key}
               type={type}
               label={currentCharacter.talentNames[key]}
+              icon={currentCharacter.talentIcons[key]}
               costs={currentCharacter.talentCosts}
               current={clamp(parseLevel(talentRanges[key].current, 1), 1, 10)}
-              desired={clamp(
-                parseLevel(talentRanges[key].desired, 10),
-                1,
-                10
-              )}
+              desired={clamp(parseLevel(talentRanges[key].desired, 10), 1, 10)}
             />
           ))}
         </DialogViewport>
