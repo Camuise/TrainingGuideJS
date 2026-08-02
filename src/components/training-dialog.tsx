@@ -171,7 +171,6 @@ function MaterialIcon({
 
 function MaterialChips({
   materials,
-  size = "md",
   className,
 }: {
   materials: MaterialAmount[]
@@ -189,7 +188,7 @@ function MaterialChips({
         >
           <MaterialIcon
             name={material.name}
-            className={size === "sm" ? "size-4" : "size-5"}
+            className="size-4"
           />
           {material.count.toLocaleString()}
         </Badge>
@@ -427,9 +426,9 @@ function CharacterSection({
                     )}
                   >
                     {isAscension ? (
-                      <Gem className="size-3.5" />
+                      <Gem className="size-4" />
                     ) : (
-                      <Zap className="size-3.5" />
+                      <Zap className="size-4" />
                     )}
                   </span>
                   {isAscension ? (

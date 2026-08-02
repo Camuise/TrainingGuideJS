@@ -113,12 +113,12 @@ export function CharacterGrid({ characters }: CharacterGridProps) {
                 <Button
                   type="button"
                   variant="destructive"
-                  size="icon-xs"
+                  size="icon-lg"
                   className="absolute top-1 right-1 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
                   aria-label={`Remove ${character.name}`}
                   onClick={() => requestDelete(name)}
                 >
-                  <Trash2 className="size-3" />
+                  <Trash2 className="size-5" />
                 </Button>
               </Card>
             )

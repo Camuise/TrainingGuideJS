@@ -12,7 +12,7 @@ export function AddCharacterButton() {
       aria-label="Add character"
       onClick={() => dispatchAddDialogOpen()}
     >
-      <Plus className="size-8" />
+      <Plus className="size-5" />
     </Button>
   )
 }
