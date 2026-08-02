@@ -112,14 +112,15 @@ export function AddCharacterDialog({ characters }: AddCharacterDialogProps) {
                 const isAdded = added.includes(character.name)
                 const isSelected = selected.has(character.name)
                 return (
-                  <button
+                  <Button
                     key={character.name}
                     type="button"
+                    variant="ghost"
                     disabled={isAdded}
                     aria-pressed={isSelected}
                     onClick={() => toggleCharacter(character.name)}
                     className={cn(
-                      "group relative flex flex-col items-center gap-1 border border-border bg-background p-2 transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-40",
+                      "group relative flex h-auto w-full flex-col items-center gap-1 border border-border bg-background p-2 whitespace-normal hover:bg-muted disabled:pointer-events-none disabled:opacity-40",
                       isSelected && "border-primary bg-muted"
                     )}
                   >
@@ -140,14 +141,18 @@ export function AddCharacterDialog({ characters }: AddCharacterDialogProps) {
                         <Check className="size-3" />
                       </span>
                     )}
-                  </button>
+                  </Button>
                 )
               })}
             </div>
           )}
         </DialogViewport>
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setOpen(false)}
+          >
             Cancel
           </Button>
           <Button

@@ -48,29 +48,34 @@ export function ThemeSelector() {
   return (
     <Popover>
       <PopoverTrigger
-        className="inline-flex h-9 w-9 items-center justify-center border border-border bg-background text-foreground shadow-sm transition-colors hover:bg-muted"
-        aria-label="Open theme selector"
+        render={
+          <Button
+            variant="outline"
+            size="icon-lg"
+            aria-label="Open theme selector"
+          />
+        }
       >
         <ActiveIcon className="size-5" />
       </PopoverTrigger>
       <PopoverContent className="w-44 p-2" align="end">
         <div className="flex flex-col gap-1">
           {themeOptions.map(({ value, label, icon: Icon }) => (
-              <Button
-                key={value}
-                type="button"
-                variant="ghost"
-                className="justify-start gap-2"
-                data-theme-option={value}
-                aria-label={`Switch to ${label.toLowerCase()} theme`}
-                onClick={() => {
-                  window.setTheme(value)
-                  setTheme(value)
-                }}
-              >
-                <Icon className="size-4" />
-                {label}
-              </Button>
+            <Button
+              key={value}
+              type="button"
+              variant="ghost"
+              className="justify-start gap-2"
+              data-theme-option={value}
+              aria-label={`Switch to ${label.toLowerCase()} theme`}
+              onClick={() => {
+                window.setTheme(value)
+                setTheme(value)
+              }}
+            >
+              <Icon className="size-4" />
+              {label}
+            </Button>
           ))}
         </div>
       </PopoverContent>

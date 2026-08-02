@@ -3,6 +3,7 @@ import { SquareOff, Trash2 } from "lucide-react"
 
 import { CharacterIcon } from "@/components/character-icon"
 import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import {
   Dialog,
   DialogDescription,
@@ -88,28 +89,27 @@ export function CharacterGrid({ characters }: CharacterGridProps) {
             const character = characterByName.get(name)
             if (!character) return null
             return (
-              <div
+              <Card
                 key={name}
-                className="group relative flex flex-col items-center gap-2 border border-border bg-card p-3"
+                size="sm"
+                className="group relative items-center gap-2"
               >
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
                   onClick={() => dispatchTrainingOpen(character.name)}
-                  className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                  className="flex h-auto w-full flex-col items-center gap-2 p-0 whitespace-normal hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring/50"
                 >
                   <CharacterIcon
                     src={character.icon}
-                    fallbackSrcs={[
-                      character.fallbackIcon,
-                      character.assetIcon,
-                    ]}
+                    fallbackSrcs={[character.fallbackIcon, character.assetIcon]}
                     alt={character.name}
                     className="size-28"
                   />
                   <span className="text-center text-xs font-medium">
                     {character.name}
                   </span>
-                </button>
+                </Button>
                 <Button
                   type="button"
                   variant="destructive"
@@ -120,7 +120,7 @@ export function CharacterGrid({ characters }: CharacterGridProps) {
                 >
                   <Trash2 className="size-3" />
                 </Button>
-              </div>
+              </Card>
             )
           })}
         </div>
