@@ -92,13 +92,13 @@ export function CharacterGrid({ characters }: CharacterGridProps) {
               <Card
                 key={name}
                 size="sm"
-                className="group relative items-center gap-2"
+                className="group relative items-center gap-2 transition-colors hover:bg-muted dark:hover:bg-foreground/15"
               >
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => dispatchTrainingOpen(character.name)}
-                  className="flex h-auto w-full flex-col items-center gap-2 p-0 whitespace-normal hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring/50"
+                  className="flex h-auto w-full flex-col items-center gap-2 p-0 whitespace-normal hover:bg-transparent dark:hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring/50"
                 >
                   <CharacterIcon
                     src={character.icon}
