@@ -186,15 +186,40 @@ function MaterialChips({
           title={material.name}
           className="gap-1 bg-background px-1.5 py-1 text-muted-foreground"
         >
-          <MaterialIcon
-            name={material.name}
-            className="size-4"
-          />
+          <MaterialIcon name={material.name} className="size-4" />
           {material.count.toLocaleString()}
         </Badge>
       ))}
     </div>
   )
+}
+
+function bookTierFor(materials: MaterialAmount[]): string | null {
+  for (const { name } of materials) {
+    if (name.startsWith("Teachings of ")) return name
+    if (name.startsWith("Guide to ")) return name
+    if (name.startsWith("Philosophies of ")) return name
+  }
+  return null
+}
+
+interface TalentStepGroup {
+  label: string
+  steps: { from: number; to: number; materials: MaterialAmount[] }[]
+}
+
+function groupTalentSteps(steps: TalentPlan["steps"]): TalentStepGroup[] {
+  const groups: TalentStepGroup[] = []
+  for (const step of steps) {
+    const label = bookTierFor(step.materials) ?? "Materials"
+    const last = groups[groups.length - 1]
+    if (last && last.label === label) {
+      last.steps.push(step)
+    } else {
+      groups.push({ label, steps: [step] })
+    }
+  }
+  return groups
 }
 
 function SummaryItem({
@@ -482,6 +507,7 @@ function TalentSection({
   costs,
   current,
   desired,
+  accent,
 }: {
   type: string
   label: string
@@ -489,11 +515,16 @@ function TalentSection({
   costs: MaterialAmount[][]
   current: number
   desired: number
+  accent: AccentClasses
 }) {
   const plan: TalentPlan | undefined = useMemo(
     () =>
       desired > current ? buildTalentPlan(costs, current, desired) : undefined,
     [costs, current, desired]
+  )
+  const groups = useMemo(
+    () => (plan ? groupTalentSteps(plan.steps) : []),
+    [plan]
   )
 
   if (!plan) return null
@@ -526,19 +557,57 @@ function TalentSection({
           ))}
         </SummaryStrip>
       )}
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        {plan.steps.map((step, index) => (
-          <Card key={index} size="sm" className="gap-1.5">
-            <CardContent className="flex flex-col gap-1.5">
-              <span className="flex items-center justify-between gap-1 text-xs">
-                <span className="text-muted-foreground">Lv.</span>
-                <span className="font-medium">
-                  {step.from} → {step.to}
-                </span>
+      <div className="flex flex-col">
+        {groups.length > 0 && (
+          <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+            Materials required per level
+          </p>
+        )}
+        {groups.map((group, index) => (
+          <div
+            key={group.label}
+            className={cn(
+              "flex flex-col gap-1.5 pt-2",
+              index > 0 && "mt-3 border-t border-border pt-3"
+            )}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex min-w-0 items-center gap-1.5">
+                <span
+                  aria-hidden
+                  className={cn("h-3.5 w-0.5 shrink-0", accent.bar)}
+                />
+                <Badge
+                  variant="outline"
+                  title={`Talent book required for these levels`}
+                  className="gap-1.5 bg-background px-1.5 py-1"
+                >
+                  <MaterialIcon name={group.label} className="size-4" />
+                  <span className="font-medium">{group.label}</span>
+                </Badge>
+              </div>
+              <span className="shrink-0 text-xs text-muted-foreground">
+                Lv. {group.steps[0].from} →{" "}
+                {group.steps[group.steps.length - 1].to}
               </span>
-              <MaterialChips materials={step.materials} size="sm" />
-            </CardContent>
-          </Card>
+            </div>
+            <div className="flex flex-col gap-1">
+              {group.steps.map((step, stepIndex) => (
+                <div
+                  key={stepIndex}
+                  className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1"
+                >
+                  <span className="shrink-0 text-xs">
+                    <span className="text-muted-foreground">Lv. </span>
+                    <span className="font-medium">{step.from}</span>
+                    <span className="text-muted-foreground"> → </span>
+                    <span className="font-medium">{step.to}</span>
+                  </span>
+                  <MaterialChips materials={step.materials} />
+                </div>
+              ))}
+            </div>
+          </div>
         ))}
       </div>
     </section>
@@ -723,6 +792,7 @@ export function TrainingDialog({ characters }: TrainingDialogProps) {
               costs={currentCharacter.talentCosts}
               current={clamp(parseLevel(talentRanges[key].current, 1), 1, 10)}
               desired={clamp(parseLevel(talentRanges[key].desired, 10), 1, 10)}
+              accent={accent}
             />
           ))}
         </DialogViewport>
