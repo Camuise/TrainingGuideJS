@@ -6,6 +6,12 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import {
   Dialog,
   DialogDescription,
   DialogFooter,
@@ -169,6 +175,25 @@ function MaterialIcon({
   )
 }
 
+function MaterialTooltip({
+  name,
+  children,
+}: {
+  name: string
+  children: ReactNode
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger render={<span className="inline-flex" />}>
+        {children}
+      </TooltipTrigger>
+      <TooltipContent side="top" sideOffset={6}>
+        <span className="truncate">{name}</span>
+      </TooltipContent>
+    </Tooltip>
+  )
+}
+
 function MaterialChips({
   materials,
   className,
@@ -180,15 +205,15 @@ function MaterialChips({
   return (
     <div className={cn("flex flex-wrap gap-1.5", className)}>
       {materials.map((material) => (
-        <Badge
-          key={material.name}
-          variant="outline"
-          title={material.name}
-          className="gap-1 bg-background px-1.5 py-1 text-muted-foreground"
-        >
-          <MaterialIcon name={material.name} className="size-4" />
-          {material.count.toLocaleString()}
-        </Badge>
+        <MaterialTooltip key={material.name} name={material.name}>
+          <Badge
+            variant="outline"
+            className="gap-1 bg-background px-1.5 py-1 text-muted-foreground"
+          >
+            <MaterialIcon name={material.name} className="size-4" />
+            {material.count.toLocaleString()}
+          </Badge>
+        </MaterialTooltip>
       ))}
     </div>
   )
@@ -231,9 +256,8 @@ function SummaryItem({
   highlight?: boolean
   title?: string
 }) {
-  return (
+  const item = (
     <span
-      title={title}
       className={cn(
         "flex items-center gap-1.5 bg-background px-2 py-1.5 text-xs text-muted-foreground",
         highlight && "text-foreground"
@@ -242,6 +266,9 @@ function SummaryItem({
       {children}
     </span>
   )
+
+  if (!title) return item
+  return <MaterialTooltip name={title}>{item}</MaterialTooltip>
 }
 
 function SummaryStrip({ children }: { children: ReactNode }) {
@@ -577,14 +604,15 @@ function TalentSection({
                   aria-hidden
                   className={cn("h-3.5 w-0.5 shrink-0", accent.bar)}
                 />
-                <Badge
-                  variant="outline"
-                  title={`Talent book required for these levels`}
-                  className="gap-1.5 bg-background px-1.5 py-1"
-                >
-                  <MaterialIcon name={group.label} className="size-4" />
-                  <span className="font-medium">{group.label}</span>
-                </Badge>
+                <MaterialTooltip name={group.label}>
+                  <Badge
+                    variant="outline"
+                    className="gap-1.5 bg-background px-1.5 py-1"
+                  >
+                    <MaterialIcon name={group.label} className="size-4" />
+                    <span className="font-medium">{group.label}</span>
+                  </Badge>
+                </MaterialTooltip>
               </div>
               <span className="shrink-0 text-xs text-muted-foreground">
                 Lv. {group.steps[0].from} →{" "}
@@ -688,124 +716,130 @@ export function TrainingDialog({ characters }: TrainingDialogProps) {
   const accent = accentFor(currentCharacter.element)
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(nextOpen) => {
-        setOpen(nextOpen)
-        if (!nextOpen) setCharacter(null)
-      }}
-    >
-      <DialogPopup className="max-h-[90svh] w-full max-w-2xl">
-        <Card className="relative shrink-0 overflow-hidden">
-          <DialogHeader className="px-(--card-spacing)">
-            <span
-              aria-hidden
-              className={cn("absolute inset-x-0 top-0 h-1", accent.bar)}
-            />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -right-3 -bottom-5 size-28"
-            >
-              <CharacterIcon
-                src={currentCharacter.icon}
-                fallbackSrcs={[
-                  currentCharacter.fallbackIcon,
-                  currentCharacter.assetIcon,
-                ]}
-                alt=""
-                className="size-28 -scale-x-100 object-contain opacity-10"
+    <TooltipProvider>
+      <Dialog
+        open={open}
+        onOpenChange={(nextOpen) => {
+          setOpen(nextOpen)
+          if (!nextOpen) setCharacter(null)
+        }}
+      >
+        <DialogPopup className="max-h-[90svh] w-full max-w-2xl">
+          <Card className="relative shrink-0 overflow-hidden">
+            <DialogHeader className="px-(--card-spacing)">
+              <span
+                aria-hidden
+                className={cn("absolute inset-x-0 top-0 h-1", accent.bar)}
               />
-            </div>
-            <div className="relative flex items-start justify-between gap-4">
-              <div className="flex min-w-0 items-center gap-3">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -right-3 -bottom-5 size-28"
+              >
                 <CharacterIcon
                   src={currentCharacter.icon}
                   fallbackSrcs={[
                     currentCharacter.fallbackIcon,
                     currentCharacter.assetIcon,
                   ]}
-                  alt={currentCharacter.name}
-                  className="size-14 shrink-0"
+                  alt=""
+                  className="size-28 -scale-x-100 object-contain opacity-10"
                 />
-                <div className="flex min-w-0 flex-col">
-                  <DialogTitle>{currentCharacter.name}</DialogTitle>
-                  <DialogDescription className="line-clamp-2">
-                    {currentCharacter.talentNames.normal} ·{" "}
-                    {currentCharacter.talentNames.skill} ·{" "}
-                    {currentCharacter.talentNames.burst}
-                  </DialogDescription>
+              </div>
+              <div className="relative flex items-start justify-between gap-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  <CharacterIcon
+                    src={currentCharacter.icon}
+                    fallbackSrcs={[
+                      currentCharacter.fallbackIcon,
+                      currentCharacter.assetIcon,
+                    ]}
+                    alt={currentCharacter.name}
+                    className="size-14 shrink-0"
+                  />
+                  <div className="flex min-w-0 flex-col">
+                    <DialogTitle>{currentCharacter.name}</DialogTitle>
+                    <DialogDescription className="line-clamp-2">
+                      {currentCharacter.talentNames.normal} ·{" "}
+                      {currentCharacter.talentNames.skill} ·{" "}
+                      {currentCharacter.talentNames.burst}
+                    </DialogDescription>
+                  </div>
+                </div>
+                <div className="flex shrink-0 flex-col items-end gap-1">
+                  <span className="text-xs font-medium">Character Level</span>
+                  <div className="flex items-center gap-2">
+                    <NumberInput
+                      value={characterRange.current}
+                      min={1}
+                      max={90}
+                      onChange={updateCharacterRange("current")}
+                      ariaLabel="Character Level current level"
+                    />
+                    <span className="text-xs text-muted-foreground">→</span>
+                    <NumberInput
+                      value={characterRange.desired}
+                      min={1}
+                      max={90}
+                      onChange={updateCharacterRange("desired")}
+                      ariaLabel="Character Level desired level"
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="flex shrink-0 flex-col items-end gap-1">
-                <span className="text-xs font-medium">Character Level</span>
-                <div className="flex items-center gap-2">
-                  <NumberInput
-                    value={characterRange.current}
-                    min={1}
-                    max={90}
-                    onChange={updateCharacterRange("current")}
-                    ariaLabel="Character Level current level"
-                  />
-                  <span className="text-xs text-muted-foreground">→</span>
-                  <NumberInput
-                    value={characterRange.desired}
-                    min={1}
-                    max={90}
-                    onChange={updateCharacterRange("desired")}
-                    ariaLabel="Character Level desired level"
-                  />
-                </div>
-              </div>
-            </div>
-          </DialogHeader>
-        </Card>
-        <Card size="sm" className="shrink-0">
-          <CardContent className="flex flex-col gap-2.5">
+            </DialogHeader>
+          </Card>
+          <Card size="sm" className="shrink-0">
+            <CardContent className="flex flex-col gap-2.5">
+              {TALENT_TYPES.map(({ key, type }) => (
+                <TalentRangeInputs
+                  key={key}
+                  icon={currentCharacter.talentIcons[key]}
+                  type={type}
+                  name={currentCharacter.talentNames[key]}
+                  current={talentRanges[key].current}
+                  desired={talentRanges[key].desired}
+                  min={1}
+                  max={10}
+                  onCurrent={updateTalentRange(key)("current")}
+                  onDesired={updateTalentRange(key)("desired")}
+                />
+              ))}
+            </CardContent>
+          </Card>
+          <DialogViewport className="flex flex-col gap-6 pr-1">
+            <CharacterSection
+              character={currentCharacter}
+              current={currentCharacterLevel}
+              desired={desiredCharacterLevel}
+            />
             {TALENT_TYPES.map(({ key, type }) => (
-              <TalentRangeInputs
+              <TalentSection
                 key={key}
-                icon={currentCharacter.talentIcons[key]}
                 type={type}
-                name={currentCharacter.talentNames[key]}
-                current={talentRanges[key].current}
-                desired={talentRanges[key].desired}
-                min={1}
-                max={10}
-                onCurrent={updateTalentRange(key)("current")}
-                onDesired={updateTalentRange(key)("desired")}
+                label={currentCharacter.talentNames[key]}
+                icon={currentCharacter.talentIcons[key]}
+                costs={currentCharacter.talentCosts}
+                current={clamp(parseLevel(talentRanges[key].current, 1), 1, 10)}
+                desired={clamp(
+                  parseLevel(talentRanges[key].desired, 10),
+                  1,
+                  10
+                )}
+                accent={accent}
               />
             ))}
-          </CardContent>
-        </Card>
-        <DialogViewport className="flex flex-col gap-6 pr-1">
-          <CharacterSection
-            character={currentCharacter}
-            current={currentCharacterLevel}
-            desired={desiredCharacterLevel}
-          />
-          {TALENT_TYPES.map(({ key, type }) => (
-            <TalentSection
-              key={key}
-              type={type}
-              label={currentCharacter.talentNames[key]}
-              icon={currentCharacter.talentIcons[key]}
-              costs={currentCharacter.talentCosts}
-              current={clamp(parseLevel(talentRanges[key].current, 1), 1, 10)}
-              desired={clamp(parseLevel(talentRanges[key].desired, 10), 1, 10)}
-              accent={accent}
-            />
-          ))}
-        </DialogViewport>
-        <DialogFooter className="shrink-0">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setOpen(false)}
-          >
-            Close
-          </Button>
-        </DialogFooter>
-      </DialogPopup>
-    </Dialog>
+          </DialogViewport>
+          <DialogFooter className="shrink-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogPopup>
+      </Dialog>
+    </TooltipProvider>
   )
 }
