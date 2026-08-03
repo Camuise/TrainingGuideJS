@@ -17,8 +17,16 @@ import {
   loadAddedCharacters,
   persistAddedCharacters,
 } from "@/lib/added-characters"
-import { dispatchTrainingOpen, onCharactersAdded } from "@/lib/events"
+import {
+  dispatchTrainingClose,
+  dispatchTrainingOpen,
+  onCharactersAdded,
+  onTrainingClose,
+  onTrainingOpen,
+} from "@/lib/events"
+import { accentFor } from "@/lib/element-accent"
 import type { PlayableCharacter } from "@/lib/playable-characters"
+import { cn } from "@/lib/utils"
 
 interface CharacterGridProps {
   characters: PlayableCharacter[]
@@ -36,6 +44,10 @@ export function CharacterGrid({ characters }: CharacterGridProps) {
   const [displayDeleteName, setDisplayDeleteName] = useState<string | null>(
     null
   )
+  const [activeName, setActiveName] = useState<string | null>(null)
+
+  useEffect(() => onTrainingOpen((name) => setActiveName(name)), [])
+  useEffect(() => onTrainingClose(() => setActiveName(null)), [])
 
   useEffect(() => {
     persistAddedCharacters(added)
@@ -92,12 +104,24 @@ export function CharacterGrid({ characters }: CharacterGridProps) {
               <Card
                 key={name}
                 size="sm"
-                className="group relative items-center gap-2 transition-colors hover:bg-muted dark:hover:bg-foreground/15"
+                className={cn(
+                  "group relative items-center gap-2 transition-colors hover:bg-muted dark:hover:bg-foreground/15",
+                  character.name === activeName && [
+                    "bg-muted ring-2 dark:bg-foreground/15",
+                    accentFor(character.element).ring,
+                  ]
+                )}
               >
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={() => dispatchTrainingOpen(character.name)}
+                  onClick={() => {
+                    if (character.name === activeName) {
+                      dispatchTrainingClose()
+                    } else {
+                      dispatchTrainingOpen(character.name)
+                    }
+                  }}
                   className="flex h-auto w-full flex-col items-center gap-2 p-0 whitespace-normal hover:bg-transparent dark:hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring/50"
                 >
                   <CharacterIcon

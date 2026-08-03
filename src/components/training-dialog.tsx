@@ -6,21 +6,24 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
+  DialogFooter,
+  DialogHeader,
+} from "@/components/ui/dialog"
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import {
-  Dialog,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogPopup,
-  DialogTitle,
-  DialogViewport,
-} from "@/components/ui/dialog"
-import { onTrainingOpen } from "@/lib/events"
+  dispatchTrainingClose,
+  onTrainingClose,
+  onTrainingOpen,
+} from "@/lib/events"
+import {
+  accentFor,
+  type AccentClasses,
+} from "@/lib/element-accent"
 import { cn } from "@/lib/utils"
 import {
   EXP_PER_HERO_WIT,
@@ -43,87 +46,6 @@ const TALENT_TYPES = [
   { key: "skill", type: "Elemental Skill" },
   { key: "burst", type: "Elemental Burst" },
 ] as const
-
-interface AccentClasses {
-  text: string
-  border: string
-  ringSoft: string
-  bgSoft: string
-  bgSoftest: string
-  bar: string
-}
-
-const ELEMENT_ACCENTS: Record<string, AccentClasses> = {
-  Anemo: {
-    text: "text-element-anemo",
-    border: "border-element-anemo",
-    ringSoft: "ring-element-anemo/40",
-    bgSoft: "bg-element-anemo/10",
-    bgSoftest: "bg-element-anemo/5",
-    bar: "bg-element-anemo",
-  },
-  Cryo: {
-    text: "text-element-cryo",
-    border: "border-element-cryo",
-    ringSoft: "ring-element-cryo/40",
-    bgSoft: "bg-element-cryo/10",
-    bgSoftest: "bg-element-cryo/5",
-    bar: "bg-element-cryo",
-  },
-  Dendro: {
-    text: "text-element-dendro",
-    border: "border-element-dendro",
-    ringSoft: "ring-element-dendro/40",
-    bgSoft: "bg-element-dendro/10",
-    bgSoftest: "bg-element-dendro/5",
-    bar: "bg-element-dendro",
-  },
-  Electro: {
-    text: "text-element-electro",
-    border: "border-element-electro",
-    ringSoft: "ring-element-electro/40",
-    bgSoft: "bg-element-electro/10",
-    bgSoftest: "bg-element-electro/5",
-    bar: "bg-element-electro",
-  },
-  Geo: {
-    text: "text-element-geo",
-    border: "border-element-geo",
-    ringSoft: "ring-element-geo/40",
-    bgSoft: "bg-element-geo/10",
-    bgSoftest: "bg-element-geo/5",
-    bar: "bg-element-geo",
-  },
-  Hydro: {
-    text: "text-element-hydro",
-    border: "border-element-hydro",
-    ringSoft: "ring-element-hydro/40",
-    bgSoft: "bg-element-hydro/10",
-    bgSoftest: "bg-element-hydro/5",
-    bar: "bg-element-hydro",
-  },
-  Pyro: {
-    text: "text-element-pyro",
-    border: "border-element-pyro",
-    ringSoft: "ring-element-pyro/40",
-    bgSoft: "bg-element-pyro/10",
-    bgSoftest: "bg-element-pyro/5",
-    bar: "bg-element-pyro",
-  },
-}
-
-const DEFAULT_ACCENT: AccentClasses = {
-  text: "text-primary",
-  border: "border-primary",
-  ringSoft: "ring-primary/40",
-  bgSoft: "bg-primary/10",
-  bgSoftest: "bg-primary/5",
-  bar: "bg-primary",
-}
-
-function accentFor(element: string): AccentClasses {
-  return ELEMENT_ACCENTS[element] ?? DEFAULT_ACCENT
-}
 
 interface LevelRange {
   current: string
@@ -688,8 +610,9 @@ export function TrainingDialog({ characters }: TrainingDialogProps) {
     [characterByName]
   )
 
+  useEffect(() => onTrainingClose(() => setOpen(false)), [])
+
   const currentCharacter = character ?? displayCharacter
-  if (!currentCharacter) return null
 
   const currentCharacterLevel = clamp(
     parseLevel(characterRange.current, 1),
@@ -713,133 +636,157 @@ export function TrainingDialog({ characters }: TrainingDialogProps) {
         [talent]: { ...prev[talent], [key]: value },
       }))
 
-  const accent = accentFor(currentCharacter.element)
+  const accent = accentFor(currentCharacter?.element ?? "")
 
   return (
     <TooltipProvider>
-      <Dialog
-        open={open}
-        onOpenChange={(nextOpen) => {
-          setOpen(nextOpen)
-          if (!nextOpen) setCharacter(null)
-        }}
+      <div
+        data-slot="training-profile"
+        inert={!open}
+        className={cn(
+          "shrink-0 overflow-hidden transition-[width] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          open ? "w-[min(28rem,calc(100vw-3rem))]" : "w-0"
+        )}
       >
-        <DialogPopup className="max-h-[90svh] w-full max-w-2xl">
-          <Card className="relative shrink-0 overflow-hidden">
-            <DialogHeader className="px-(--card-spacing)">
-              <span
-                aria-hidden
-                className={cn("absolute inset-x-0 top-0 h-1", accent.bar)}
-              />
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -right-3 -bottom-5 size-28"
-              >
-                <CharacterIcon
-                  src={currentCharacter.icon}
-                  fallbackSrcs={[
-                    currentCharacter.fallbackIcon,
-                    currentCharacter.assetIcon,
-                  ]}
-                  alt=""
-                  className="size-28 -scale-x-100 object-contain opacity-10"
-                />
-              </div>
-              <div className="relative flex items-start justify-between gap-4">
-                <div className="flex min-w-0 items-center gap-3">
-                  <CharacterIcon
-                    src={currentCharacter.icon}
-                    fallbackSrcs={[
-                      currentCharacter.fallbackIcon,
-                      currentCharacter.assetIcon,
-                    ]}
-                    alt={currentCharacter.name}
-                    className="size-14 shrink-0"
+        <Card
+          aria-hidden={!open}
+          className={cn(
+            "h-full w-[min(28rem,calc(100vw-3rem))] flex-col gap-4 border border-foreground/10 p-4 ring-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+            open ? "translate-x-0" : "translate-x-full"
+          )}
+        >
+          {currentCharacter && (
+            <>
+              <Card className="relative shrink-0 overflow-hidden">
+                <DialogHeader className="px-(--card-spacing)">
+                  <span
+                    aria-hidden
+                    className={cn("absolute inset-x-0 top-0 h-1", accent.bar)}
                   />
-                  <div className="flex min-w-0 flex-col">
-                    <DialogTitle>{currentCharacter.name}</DialogTitle>
-                    <DialogDescription className="line-clamp-2">
-                      {currentCharacter.talentNames.normal} ·{" "}
-                      {currentCharacter.talentNames.skill} ·{" "}
-                      {currentCharacter.talentNames.burst}
-                    </DialogDescription>
-                  </div>
-                </div>
-                <div className="flex shrink-0 flex-col items-end gap-1">
-                  <span className="text-xs font-medium">Character Level</span>
-                  <div className="flex items-center gap-2">
-                    <NumberInput
-                      value={characterRange.current}
-                      min={1}
-                      max={90}
-                      onChange={updateCharacterRange("current")}
-                      ariaLabel="Character Level current level"
-                    />
-                    <span className="text-xs text-muted-foreground">→</span>
-                    <NumberInput
-                      value={characterRange.desired}
-                      min={1}
-                      max={90}
-                      onChange={updateCharacterRange("desired")}
-                      ariaLabel="Character Level desired level"
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute -right-3 -bottom-5 size-28"
+                  >
+                    <CharacterIcon
+                      src={currentCharacter.icon}
+                      fallbackSrcs={[
+                        currentCharacter.fallbackIcon,
+                        currentCharacter.assetIcon,
+                      ]}
+                      alt=""
+                      className="size-28 -scale-x-100 object-contain opacity-10"
                     />
                   </div>
-                </div>
-              </div>
-            </DialogHeader>
-          </Card>
-          <Card size="sm" className="shrink-0">
-            <CardContent className="flex flex-col gap-2.5">
-              {TALENT_TYPES.map(({ key, type }) => (
-                <TalentRangeInputs
-                  key={key}
-                  icon={currentCharacter.talentIcons[key]}
-                  type={type}
-                  name={currentCharacter.talentNames[key]}
-                  current={talentRanges[key].current}
-                  desired={talentRanges[key].desired}
-                  min={1}
-                  max={10}
-                  onCurrent={updateTalentRange(key)("current")}
-                  onDesired={updateTalentRange(key)("desired")}
+                  <div className="relative flex items-start justify-between gap-4">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <CharacterIcon
+                        src={currentCharacter.icon}
+                        fallbackSrcs={[
+                          currentCharacter.fallbackIcon,
+                          currentCharacter.assetIcon,
+                        ]}
+                        alt={currentCharacter.name}
+                        className="size-14 shrink-0"
+                      />
+                      <div className="flex min-w-0 flex-col">
+                        <h2 className="font-heading text-lg font-medium">
+                          {currentCharacter.name}
+                        </h2>
+                        <p className="line-clamp-2 text-xs/relaxed text-muted-foreground">
+                          {currentCharacter.talentNames.normal} ·{" "}
+                          {currentCharacter.talentNames.skill} ·{" "}
+                          {currentCharacter.talentNames.burst}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex shrink-0 flex-col items-end gap-1">
+                      <span className="text-xs font-medium">
+                        Character Level
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <NumberInput
+                          value={characterRange.current}
+                          min={1}
+                          max={90}
+                          onChange={updateCharacterRange("current")}
+                          ariaLabel="Character Level current level"
+                        />
+                        <span className="text-xs text-muted-foreground">
+                          →
+                        </span>
+                        <NumberInput
+                          value={characterRange.desired}
+                          min={1}
+                          max={90}
+                          onChange={updateCharacterRange("desired")}
+                          ariaLabel="Character Level desired level"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </DialogHeader>
+              </Card>
+              <Card size="sm" className="shrink-0">
+                <CardContent className="flex flex-col gap-2.5">
+                  {TALENT_TYPES.map(({ key, type }) => (
+                    <TalentRangeInputs
+                      key={key}
+                      icon={currentCharacter.talentIcons[key]}
+                      type={type}
+                      name={currentCharacter.talentNames[key]}
+                      current={talentRanges[key].current}
+                      desired={talentRanges[key].desired}
+                      min={1}
+                      max={10}
+                      onCurrent={updateTalentRange(key)("current")}
+                      onDesired={updateTalentRange(key)("desired")}
+                    />
+                  ))}
+                </CardContent>
+              </Card>
+              <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pr-1">
+                <CharacterSection
+                  character={currentCharacter}
+                  current={currentCharacterLevel}
+                  desired={desiredCharacterLevel}
                 />
-              ))}
-            </CardContent>
-          </Card>
-          <DialogViewport className="flex flex-col gap-6 pr-1">
-            <CharacterSection
-              character={currentCharacter}
-              current={currentCharacterLevel}
-              desired={desiredCharacterLevel}
-            />
-            {TALENT_TYPES.map(({ key, type }) => (
-              <TalentSection
-                key={key}
-                type={type}
-                label={currentCharacter.talentNames[key]}
-                icon={currentCharacter.talentIcons[key]}
-                costs={currentCharacter.talentCosts}
-                current={clamp(parseLevel(talentRanges[key].current, 1), 1, 10)}
-                desired={clamp(
-                  parseLevel(talentRanges[key].desired, 10),
-                  1,
-                  10
-                )}
-                accent={accent}
-              />
-            ))}
-          </DialogViewport>
-          <DialogFooter className="shrink-0">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogPopup>
-      </Dialog>
+                {TALENT_TYPES.map(({ key, type }) => (
+                  <TalentSection
+                    key={key}
+                    type={type}
+                    label={currentCharacter.talentNames[key]}
+                    icon={currentCharacter.talentIcons[key]}
+                    costs={currentCharacter.talentCosts}
+                    current={clamp(
+                      parseLevel(talentRanges[key].current, 1),
+                      1,
+                      10
+                    )}
+                    desired={clamp(
+                      parseLevel(talentRanges[key].desired, 10),
+                      1,
+                      10
+                    )}
+                    accent={accent}
+                  />
+                ))}
+              </div>
+              <DialogFooter className="shrink-0">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setOpen(false)
+                    dispatchTrainingClose()
+                  }}
+                >
+                  Close
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </Card>
+      </div>
     </TooltipProvider>
   )
 }

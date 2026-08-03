@@ -1,6 +1,7 @@
 export const ADD_DIALOG_OPEN_EVENT = "add-dialog:open"
 export const CHARACTERS_ADDED_EVENT = "characters:added"
 export const TRAINING_OPEN_EVENT = "training:open"
+export const TRAINING_CLOSE_EVENT = "training:close"
 
 export function dispatchAddDialogOpen(): void {
   window.dispatchEvent(new CustomEvent(ADD_DIALOG_OPEN_EVENT))
@@ -31,4 +32,13 @@ export function onTrainingOpen(listener: (name: string) => void): () => void {
     listener((event as CustomEvent<string>).detail)
   window.addEventListener(TRAINING_OPEN_EVENT, handler)
   return () => window.removeEventListener(TRAINING_OPEN_EVENT, handler)
+}
+
+export function dispatchTrainingClose(): void {
+  window.dispatchEvent(new CustomEvent(TRAINING_CLOSE_EVENT))
+}
+
+export function onTrainingClose(listener: () => void): () => void {
+  window.addEventListener(TRAINING_CLOSE_EVENT, listener)
+  return () => window.removeEventListener(TRAINING_CLOSE_EVENT, listener)
 }
