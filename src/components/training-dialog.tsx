@@ -435,13 +435,13 @@ function CharacterSection({
                     <Card
                       size="sm"
                       className={cn(
-                        "min-w-0 flex-1",
+                        "min-w-0 flex-1 p-1.75",
                         accent.ringSoft,
                         accent.bgSoftest
                       )}
                     >
-                      <CardContent className="flex flex-col gap-1.5">
-                        <span className="flex items-center gap-1.5 text-xs">
+                      <CardContent className="flex flex-col gap-1.5 p-0">
+                        <span className="flex items-center gap-1 text-xs">
                           <span className="font-medium">{step.label}</span>
                           <span className="text-muted-foreground">
                             at Lv. {step.level}
