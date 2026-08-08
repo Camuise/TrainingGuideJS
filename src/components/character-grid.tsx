@@ -105,7 +105,7 @@ export function CharacterGrid({ characters }: CharacterGridProps) {
                 key={name}
                 size="sm"
                 className={cn(
-                  "group relative items-center gap-2 transition-colors hover:bg-muted dark:hover:bg-foreground/15",
+                  "group relative items-center gap-2 ring-inset transition-colors hover:bg-muted dark:hover:bg-foreground/15",
                   character.name === activeName && [
                     "bg-muted ring-2 dark:bg-foreground/15",
                     accentFor(character.element).ring,

@@ -20,7 +20,7 @@ import { playableCharacters } from "@/lib/playable-characters"
       </header>
 
       <div class="flex min-h-0 flex-1 items-stretch">
-        <div class="min-h-0 min-w-0 flex-1 overflow-y-auto p-1">
+        <div class="min-h-0 min-w-0 flex-1 overflow-y-auto">
           <CharacterGrid characters={playableCharacters} client:load />
         </div>
         <TrainingDialog characters={playableCharacters} client:load />

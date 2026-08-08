@@ -645,7 +645,7 @@ export function TrainingDialog({ characters }: TrainingDialogProps) {
         inert={!open}
         className={cn(
           "shrink-0 overflow-hidden transition-[width,margin-left] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
-          open ? "ml-2 w-[min(28rem,calc(100vw-3rem))]" : "w-0"
+          open ? "ml-3 w-[min(28rem,calc(100vw-3rem))]" : "w-0"
         )}
       >
         <Card
