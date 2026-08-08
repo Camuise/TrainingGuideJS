@@ -107,9 +107,14 @@ export interface MaterialAmount {
   count: number
 }
 
+function elementIconFor(element: string): string {
+  return genshin.elements(element)?.images?.base64 ?? ""
+}
+
 export interface PlayableCharacter {
   name: string
   element: string
+  elementIcon: string
   icon: string
   fallbackIcon: string
   assetIcon: string
@@ -151,6 +156,7 @@ export const playableCharacters: PlayableCharacter[] = genshin
     return {
       name: character?.name ?? name,
       element: character?.elementText ?? "",
+      elementIcon: elementIconFor(character?.elementText ?? ""),
       icon: character?.images.mihoyo_icon ?? "",
       fallbackIcon: character?.images.hoyowiki_icon ?? "",
       assetIcon: character
