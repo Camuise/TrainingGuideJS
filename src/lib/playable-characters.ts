@@ -159,26 +159,33 @@ function collectTier(tier: Items[]): MaterialAmount[] {
   return tier.map((item) => collectMaterial(item.name, item.count))
 }
 
-export const playableCharacters: PlayableCharacter[] = genshin
-  .characters("names", { matchCategories: true })
-  .map((name) => {
-    const character = genshin.characters(name)
-    const talentKey = name === "Aether" || name === "Lumine" ? "Traveler" : name
-    const talents = genshin.talents(talentKey)
+const TRAVELER_ELEMENTS = [
+  "Anemo",
+  "Cryo",
+  "Dendro",
+  "Electro",
+  "Geo",
+  "Hydro",
+  "Pyro",
+]
 
+function travelerEntries(): PlayableCharacter[] {
+  const character = genshin.characters("Aether")
+  if (!character) return []
+  const ascension = Object.values(character.costs).map((tier) =>
+    collectTier(tier)
+  )
+  return TRAVELER_ELEMENTS.map((element) => {
+    const talents = genshin.talents(`Traveler (${element})`)
     return {
-      name: character?.name ?? name,
-      element: character?.elementText ?? "",
-      elementIcon: elementIconFor(character?.elementText ?? ""),
-      weaponType: weaponTypeFor(character?.weaponType ?? ""),
-      icon: character?.images.mihoyo_icon ?? "",
-      fallbackIcon: character?.images.hoyowiki_icon ?? "",
-      assetIcon: character
-        ? `https://enka.network/ui/${character.images.filename_icon}.png`
-        : "",
-      ascension: character
-        ? Object.values(character.costs).map((tier) => collectTier(tier))
-        : [],
+      name: `Traveler (${element})`,
+      element,
+      elementIcon: elementIconFor(element),
+      weaponType: weaponTypeFor(character.weaponType ?? ""),
+      icon: character.images.hoyowiki_icon ?? "",
+      fallbackIcon: character.images.mihoyo_icon ?? "",
+      assetIcon: `https://enka.network/ui/${character.images.filename_icon}.png`,
+      ascension,
       talentCosts: talents
         ? Object.values(talents.costs).map((cost) => collectTier(cost))
         : [],
@@ -200,4 +207,49 @@ export const playableCharacters: PlayableCharacter[] = genshin
       },
     }
   })
-  .sort((a, b) => a.name.localeCompare(b.name))
+}
+
+export const playableCharacters: PlayableCharacter[] = [
+  ...genshin
+    .characters("names", { matchCategories: true })
+    .filter((name) => name !== "Aether" && name !== "Lumine")
+    .map((name) => {
+      const character = genshin.characters(name)
+      const talents = genshin.talents(name)
+
+      return {
+        name: character?.name ?? name,
+        element: character?.elementText ?? "",
+        elementIcon: elementIconFor(character?.elementText ?? ""),
+        weaponType: weaponTypeFor(character?.weaponType ?? ""),
+        icon: character?.images.mihoyo_icon ?? "",
+        fallbackIcon: character?.images.hoyowiki_icon ?? "",
+        assetIcon: character
+          ? `https://enka.network/ui/${character.images.filename_icon}.png`
+          : "",
+        ascension: character
+          ? Object.values(character.costs).map((tier) => collectTier(tier))
+          : [],
+        talentCosts: talents
+          ? Object.values(talents.costs).map((cost) => collectTier(cost))
+          : [],
+        talentNames: {
+          normal: talents?.combat1?.name ?? "Normal Attack",
+          skill: talents?.combat2?.name ?? "Elemental Skill",
+          burst: talents?.combat3?.name ?? "Elemental Burst",
+        },
+        talentIcons: {
+          normal: talents?.images?.filename_combat1
+            ? `https://enka.network/ui/${talents.images.filename_combat1}.png`
+            : "",
+          skill: talents?.images?.filename_combat2
+            ? `https://enka.network/ui/${talents.images.filename_combat2}.png`
+            : "",
+          burst: talents?.images?.filename_combat3
+            ? `https://enka.network/ui/${talents.images.filename_combat3}.png`
+            : "",
+        },
+      }
+    }),
+  ...travelerEntries(),
+].sort((a, b) => a.name.localeCompare(b.name))

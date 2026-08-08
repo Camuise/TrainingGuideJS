@@ -1,5 +1,10 @@
 export const ADDED_CHARACTERS_KEY = "added-characters"
 
+const TRAVELER_ALIASES: Record<string, string> = {
+  Aether: "Traveler (Anemo)",
+  Lumine: "Traveler (Anemo)",
+}
+
 export function loadAddedCharacters(validNames: Set<string>): string[] {
   try {
     const raw = window.localStorage.getItem(ADDED_CHARACTERS_KEY)
@@ -9,9 +14,11 @@ export function loadAddedCharacters(validNames: Set<string>): string[] {
     const seen = new Set<string>()
     const result: string[] = []
     for (const name of parsed) {
-      if (typeof name === "string" && validNames.has(name) && !seen.has(name)) {
-        seen.add(name)
-        result.push(name)
+      const resolved =
+        typeof name === "string" ? (TRAVELER_ALIASES[name] ?? name) : ""
+      if (resolved && validNames.has(resolved) && !seen.has(resolved)) {
+        seen.add(resolved)
+        result.push(resolved)
       }
     }
     return result
