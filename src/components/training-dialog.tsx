@@ -684,18 +684,21 @@ export function TrainingDialog({ characters }: TrainingDialogProps) {
                         className="size-14 shrink-0"
                       />
                       <div className="flex min-w-0 flex-col">
-                        <div className="flex items-center gap-1.5">
-                          {currentCharacter.elementIcon && (
-                            <img
-                              src={currentCharacter.elementIcon}
-                              alt=""
-                              className="size-4 shrink-0 object-contain"
-                            />
-                          )}
-                          <h2 className="font-heading text-lg font-medium">
-                            {currentCharacter.name}
-                          </h2>
-                        </div>
+                        <h2 className="font-heading text-lg font-medium">
+                          {currentCharacter.name}
+                        </h2>
+                        {currentCharacter.element && (
+                          <p className="flex items-center gap-1.5 line-clamp-2 text-xs/relaxed text-muted-foreground">
+                            {currentCharacter.elementIcon && (
+                              <img
+                                src={currentCharacter.elementIcon}
+                                alt=""
+                                className="size-4 shrink-0 object-contain"
+                              />
+                            )}
+                            {currentCharacter.element}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <div className="flex shrink-0 flex-col items-end gap-1">
