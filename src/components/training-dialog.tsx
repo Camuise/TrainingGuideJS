@@ -3,12 +3,8 @@ import { Gem, TrendingUp, Zap } from "lucide-react"
 
 import { CharacterIcon } from "@/components/character-icon"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  DialogFooter,
-  DialogHeader,
-} from "@/components/ui/dialog"
+import { DialogHeader } from "@/components/ui/dialog"
 import {
   Tooltip,
   TooltipContent,
@@ -16,7 +12,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import {
-  dispatchTrainingClose,
   onTrainingClose,
   onTrainingOpen,
 } from "@/lib/events"
@@ -771,18 +766,6 @@ export function TrainingDialog({ characters }: TrainingDialogProps) {
                   />
                 ))}
               </div>
-              <DialogFooter className="shrink-0">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setOpen(false)
-                    dispatchTrainingClose()
-                  }}
-                >
-                  Close
-                </Button>
-              </DialogFooter>
             </>
           )}
         </Card>
