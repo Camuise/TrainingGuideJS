@@ -9,9 +9,9 @@ import { playableCharacters } from "@/lib/playable-characters"
 ---
 
 <Layout>
-  <div class="flex h-full min-h-svh p-6">
-    <div class="flex w-full flex-col gap-4 text-sm leading-loose">
-      <header class="flex flex-wrap items-center justify-between gap-3">
+  <div class="flex h-svh overflow-hidden p-6">
+    <div class="flex w-full min-h-0 flex-col gap-4 text-sm leading-loose">
+      <header class="flex shrink-0 flex-wrap items-center justify-between gap-3">
         <h1 class="text-4xl font-bold">Training Guide Dashboard</h1>
         <div class="flex items-center gap-2">
           <ThemeSelector client:load />
@@ -19,8 +19,8 @@ import { playableCharacters } from "@/lib/playable-characters"
         </div>
       </header>
 
-      <div class="flex min-w-0 flex-1 items-start gap-3">
-        <div class="min-w-0 flex-1">
+      <div class="flex min-h-0 flex-1 items-stretch">
+        <div class="min-h-0 min-w-0 flex-1 overflow-y-auto p-1">
           <CharacterGrid characters={playableCharacters} client:load />
         </div>
         <TrainingDialog characters={playableCharacters} client:load />
