@@ -697,6 +697,8 @@ export function TrainingDialog({ characters }: TrainingDialogProps) {
                               />
                             )}
                             {currentCharacter.element}
+                            {currentCharacter.weaponType &&
+                              ` ${currentCharacter.weaponType}`}
                           </p>
                         )}
                       </div>

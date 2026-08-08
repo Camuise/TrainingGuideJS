@@ -111,10 +111,23 @@ function elementIconFor(element: string): string {
   return genshin.elements(element)?.images?.base64 ?? ""
 }
 
+const WEAPON_TYPE_NAMES: Record<string, string> = {
+  WEAPON_SWORD_ONE_HAND: "Sword",
+  WEAPON_CLAYMORE: "Claymore",
+  WEAPON_BOW: "Bow",
+  WEAPON_POLE: "Polearm",
+  WEAPON_CATALYST: "Catalyst",
+}
+
+function weaponTypeFor(type: string): string {
+  return WEAPON_TYPE_NAMES[type] ?? type
+}
+
 export interface PlayableCharacter {
   name: string
   element: string
   elementIcon: string
+  weaponType: string
   icon: string
   fallbackIcon: string
   assetIcon: string
@@ -157,6 +170,7 @@ export const playableCharacters: PlayableCharacter[] = genshin
       name: character?.name ?? name,
       element: character?.elementText ?? "",
       elementIcon: elementIconFor(character?.elementText ?? ""),
+      weaponType: weaponTypeFor(character?.weaponType ?? ""),
       icon: character?.images.mihoyo_icon ?? "",
       fallbackIcon: character?.images.hoyowiki_icon ?? "",
       assetIcon: character

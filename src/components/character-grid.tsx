@@ -130,7 +130,14 @@ export function CharacterGrid({ characters }: CharacterGridProps) {
                     alt={character.name}
                     className="size-28"
                   />
-                  <span className="text-center text-xs font-medium">
+                  <span className="flex items-center gap-1.5 text-center text-xs font-medium">
+                    {character.elementIcon && (
+                      <img
+                        src={character.elementIcon}
+                        alt=""
+                        className="size-4 shrink-0 object-contain"
+                      />
+                    )}
                     {character.name}
                   </span>
                 </Button>
