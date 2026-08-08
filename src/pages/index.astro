@@ -1,32 +1,9 @@
 ---
 import Layout from "@/layouts/main.astro"
-import { AddCharacterButton } from "@/components/add-character-button"
-import { AddCharacterDialog } from "@/components/add-character-dialog"
-import { CharacterGrid } from "@/components/character-grid"
-import { ThemeSelector } from "@/components/theme-selector"
-import { TrainingDialog } from "@/components/training-dialog"
+import { AppShell } from "@/components/app-shell"
 import { playableCharacters } from "@/lib/playable-characters"
 ---
 
 <Layout>
-  <div class="flex h-svh overflow-hidden p-6">
-    <div class="flex w-full min-h-0 flex-col gap-4 text-sm leading-loose">
-      <header class="flex shrink-0 flex-wrap items-center justify-between gap-3">
-        <h1 class="text-4xl font-bold">Training Guide Dashboard</h1>
-        <div class="flex items-center gap-2">
-          <ThemeSelector client:load />
-          <AddCharacterButton client:load />
-        </div>
-      </header>
-
-      <div class="flex min-h-0 flex-1 items-stretch">
-        <div class="min-h-0 min-w-0 flex-1 overflow-y-auto">
-          <CharacterGrid characters={playableCharacters} client:load />
-        </div>
-        <TrainingDialog characters={playableCharacters} client:load />
-      </div>
-
-      <AddCharacterDialog characters={playableCharacters} client:load />
-    </div>
-  </div>
+  <AppShell characters={playableCharacters} client:load />
 </Layout>

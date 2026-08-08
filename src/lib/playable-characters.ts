@@ -159,6 +159,14 @@ function collectTier(tier: Items[]): MaterialAmount[] {
   return tier.map((item) => collectMaterial(item.name, item.count))
 }
 
+for (const book of [
+  "Hero's Wit",
+  "Adventurer's Experience",
+  "Wanderer's Advice",
+]) {
+  collectMaterial(book, 0)
+}
+
 const TRAVELER_ELEMENTS = [
   "Anemo",
   "Cryo",

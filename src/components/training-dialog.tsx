@@ -2,30 +2,28 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react"
 import { Gem, TrendingUp, Zap } from "lucide-react"
 
 import { CharacterIcon } from "@/components/character-icon"
+import { MaterialIcon, MaterialTooltip } from "@/components/material-icon"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { DialogHeader } from "@/components/ui/dialog"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import {
+  dispatchTrainingPlansChanged,
   onTrainingClose,
   onTrainingOpen,
 } from "@/lib/events"
-import {
-  accentFor,
-  type AccentClasses,
-} from "@/lib/element-accent"
+import { accentFor, type AccentClasses } from "@/lib/element-accent"
 import { cn } from "@/lib/utils"
 import {
   EXP_PER_HERO_WIT,
-  materialIcons,
   type MaterialAmount,
   type PlayableCharacter,
 } from "@/lib/playable-characters"
+import {
+  loadTrainingState,
+  saveTrainingState,
+  type LevelRange as SavedLevelRange,
+} from "@/lib/training-state"
 import {
   buildCharacterPlan,
   buildTalentPlan,
@@ -56,59 +54,8 @@ function parseLevel(value: string, fallback: number): number {
   return Number.isFinite(parsed) ? parsed : fallback
 }
 
-function MaterialIcon({
-  name,
-  className,
-}: {
-  name: string
-  className?: string
-}) {
-  const src = materialIcons[name]
-  const [failed, setFailed] = useState(false)
-
-  if (!src || failed) {
-    return (
-      <Badge
-        aria-hidden
-        variant="outline"
-        className={cn(
-          "justify-center bg-muted p-0 text-muted-foreground",
-          className
-        )}
-      >
-        {name.slice(0, 1)}
-      </Badge>
-    )
-  }
-
-  return (
-    <img
-      src={src}
-      alt=""
-      loading="lazy"
-      onError={() => setFailed(true)}
-      className={cn("object-contain", className)}
-    />
-  )
-}
-
-function MaterialTooltip({
-  name,
-  children,
-}: {
-  name: string
-  children: ReactNode
-}) {
-  return (
-    <Tooltip>
-      <TooltipTrigger render={<span className="inline-flex" />}>
-        {children}
-      </TooltipTrigger>
-      <TooltipContent side="top" sideOffset={6}>
-        <span className="truncate">{name}</span>
-      </TooltipContent>
-    </Tooltip>
-  )
+function toRangeStrings(range: SavedLevelRange): LevelRange {
+  return { current: String(range.current), desired: String(range.desired) }
 }
 
 function MaterialChips({
@@ -590,11 +537,22 @@ export function TrainingDialog({ characters }: TrainingDialogProps) {
         const next = characterByName.get(name)
         if (!next) return
         if (next.name !== lastCharacterName.current) {
-          setCharacterRange(DEFAULT_CHARACTER_RANGE)
+          const saved = loadTrainingState(name)
+          setCharacterRange(
+            saved
+              ? toRangeStrings(saved.characterLevel)
+              : DEFAULT_CHARACTER_RANGE
+          )
           setTalentRanges({
-            normal: DEFAULT_TALENT_RANGE,
-            skill: DEFAULT_TALENT_RANGE,
-            burst: DEFAULT_TALENT_RANGE,
+            normal: saved
+              ? toRangeStrings(saved.talents.normal)
+              : DEFAULT_TALENT_RANGE,
+            skill: saved
+              ? toRangeStrings(saved.talents.skill)
+              : DEFAULT_TALENT_RANGE,
+            burst: saved
+              ? toRangeStrings(saved.talents.burst)
+              : DEFAULT_TALENT_RANGE,
           })
           lastCharacterName.current = next.name
         }
@@ -619,6 +577,31 @@ export function TrainingDialog({ characters }: TrainingDialogProps) {
     1,
     90
   )
+
+  useEffect(() => {
+    if (!currentCharacter) return
+    const clampTalentRange = (range: LevelRange): SavedLevelRange => ({
+      current: clamp(parseLevel(range.current, 1), 1, 10),
+      desired: clamp(parseLevel(range.desired, 10), 1, 10),
+    })
+    saveTrainingState(currentCharacter.name, {
+      characterLevel: {
+        current: currentCharacterLevel,
+        desired: desiredCharacterLevel,
+      },
+      talents: {
+        normal: clampTalentRange(talentRanges.normal),
+        skill: clampTalentRange(talentRanges.skill),
+        burst: clampTalentRange(talentRanges.burst),
+      },
+    })
+    dispatchTrainingPlansChanged()
+  }, [
+    currentCharacter,
+    currentCharacterLevel,
+    desiredCharacterLevel,
+    talentRanges,
+  ])
 
   const updateCharacterRange = (key: keyof LevelRange) => (value: string) =>
     setCharacterRange((prev) => ({ ...prev, [key]: value }))
@@ -688,7 +671,7 @@ export function TrainingDialog({ characters }: TrainingDialogProps) {
                           {currentCharacter.name}
                         </h2>
                         {currentCharacter.element && (
-                          <p className="flex items-center gap-1.5 line-clamp-2 text-xs/relaxed text-muted-foreground">
+                          <p className="line-clamp-2 flex items-center gap-1.5 text-xs/relaxed text-muted-foreground">
                             {currentCharacter.elementIcon && (
                               <img
                                 src={currentCharacter.elementIcon}
@@ -715,9 +698,7 @@ export function TrainingDialog({ characters }: TrainingDialogProps) {
                           onChange={updateCharacterRange("current")}
                           ariaLabel="Character Level current level"
                         />
-                        <span className="text-xs text-muted-foreground">
-                          →
-                        </span>
+                        <span className="text-xs text-muted-foreground">→</span>
                         <NumberInput
                           value={characterRange.desired}
                           min={1}

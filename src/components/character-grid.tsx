@@ -14,13 +14,8 @@ import {
 } from "@/components/ui/dialog"
 import { Empty, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import {
-  loadAddedCharacters,
-  persistAddedCharacters,
-} from "@/lib/added-characters"
-import {
   dispatchTrainingClose,
   dispatchTrainingOpen,
-  onCharactersAdded,
   onTrainingClose,
   onTrainingOpen,
 } from "@/lib/events"
@@ -30,15 +25,18 @@ import { cn } from "@/lib/utils"
 
 interface CharacterGridProps {
   characters: PlayableCharacter[]
+  added: string[]
+  onRemove: (name: string) => void
 }
 
-export function CharacterGrid({ characters }: CharacterGridProps) {
+export function CharacterGrid({
+  characters,
+  added,
+  onRemove,
+}: CharacterGridProps) {
   const characterByName = useMemo(
     () => new Map(characters.map((character) => [character.name, character])),
     [characters]
-  )
-  const [added, setAdded] = useState<string[]>(() =>
-    loadAddedCharacters(new Set(characterByName.keys()))
   )
   const [pendingDelete, setPendingDelete] = useState<string | null>(null)
   const [displayDeleteName, setDisplayDeleteName] = useState<string | null>(
@@ -49,29 +47,6 @@ export function CharacterGrid({ characters }: CharacterGridProps) {
   useEffect(() => onTrainingOpen((name) => setActiveName(name)), [])
   useEffect(() => onTrainingClose(() => setActiveName(null)), [])
 
-  useEffect(() => {
-    persistAddedCharacters(added)
-  }, [added])
-
-  useEffect(
-    () =>
-      onCharactersAdded((names) => {
-        const validNames = characterByName
-        setAdded((prev) => {
-          const next = [...prev]
-          for (const name of names) {
-            if (validNames.has(name) && !next.includes(name)) next.push(name)
-          }
-          return next
-        })
-      }),
-    [characterByName]
-  )
-
-  const removeCharacter = (name: string) => {
-    setAdded((prev) => prev.filter((addedName) => addedName !== name))
-  }
-
   const requestDelete = (name: string) => {
     setDisplayDeleteName(name)
     setPendingDelete(name)
@@ -80,7 +55,7 @@ export function CharacterGrid({ characters }: CharacterGridProps) {
   const closeDeleteDialog = () => setPendingDelete(null)
 
   const confirmDelete = () => {
-    if (pendingDelete) removeCharacter(pendingDelete)
+    if (pendingDelete) onRemove(pendingDelete)
     setPendingDelete(null)
   }
 
@@ -105,7 +80,7 @@ export function CharacterGrid({ characters }: CharacterGridProps) {
                 key={name}
                 size="sm"
                 className={cn(
-                  "group relative items-center gap-2 ring-inset transition-colors hover:bg-muted dark:hover:bg-foreground/15",
+                  "group relative items-center gap-2 transition-colors ring-inset hover:bg-muted dark:hover:bg-foreground/15",
                   character.name === activeName && [
                     "bg-muted ring-2 dark:bg-foreground/15",
                     accentFor(character.element).ring,
@@ -122,7 +97,7 @@ export function CharacterGrid({ characters }: CharacterGridProps) {
                       dispatchTrainingOpen(character.name)
                     }
                   }}
-                  className="flex h-auto w-full flex-col items-center gap-2 p-0 whitespace-normal hover:bg-transparent dark:hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring/50"
+                  className="flex h-auto w-full flex-col items-center gap-2 p-0 whitespace-normal hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring/50 dark:hover:bg-transparent"
                 >
                   <CharacterIcon
                     src={character.icon}
