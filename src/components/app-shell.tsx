@@ -1,14 +1,16 @@
-import { useEffect, useMemo, useState } from "react"
-import { Search } from "lucide-react"
-
 import { AddCharacterButton } from "@/components/add-character-button"
 import { AddCharacterDialog } from "@/components/add-character-dialog"
+import { Button } from "@/components/ui/button"
 import { CharacterGrid } from "@/components/character-grid"
+import { cn } from "@/lib/utils"
 import { ErrorBoundary } from "@/components/error-boundary"
+import { removeTrainingState } from "@/lib/training-state"
+import { Search } from "lucide-react"
 import { Summary } from "@/components/summary"
 import { ThemeSelector } from "@/components/theme-selector"
 import { TrainingDialog } from "@/components/training-dialog"
-import { Button } from "@/components/ui/button"
+import { useEffect, useMemo, useState } from "react"
+
 import {
   loadAddedCharacters,
   persistAddedCharacters,
@@ -19,8 +21,6 @@ import {
   onViewChange,
 } from "@/lib/events"
 import type { PlayableCharacter } from "@/lib/playable-characters"
-import { removeTrainingState } from "@/lib/training-state"
-import { cn } from "@/lib/utils"
 
 interface AppShellProps {
   characters: PlayableCharacter[]
@@ -81,7 +81,7 @@ export function AppShell({ characters }: AppShellProps) {
               >
                 <Search className="size-5" />
               </Button>
-              <div className="flex items-center gap-0.5 border border-border bg-muted">
+              <div className="flex h-11 items-center gap-1 border border-border bg-muted px-1">
                 {VIEWS.map((item) => (
                   <button
                     key={item}
@@ -90,7 +90,7 @@ export function AppShell({ characters }: AppShellProps) {
                     aria-pressed={view === item}
                     onClick={() => setView(item)}
                     className={cn(
-                      "h-11 px-3 text-xs font-medium capitalize transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+                      "h-9 px-3 text-xs font-medium capitalize transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
                       view === item
                         ? "bg-primary text-primary-foreground"
                         : "text-muted-foreground hover:bg-background hover:text-foreground"
@@ -105,35 +105,35 @@ export function AppShell({ characters }: AppShellProps) {
             </div>
           </header>
 
-        <div className="flex min-h-0 flex-1 items-stretch">
-          <div
-            className={cn(
-              "min-h-0 min-w-0 flex-1 overflow-y-auto",
-              view !== "characters" && "hidden"
-            )}
-          >
-            <CharacterGrid
-              characters={characters}
-              added={added}
-              onRemove={handleRemove}
-            />
+          <div className="flex min-h-0 flex-1 items-stretch">
+            <div
+              className={cn(
+                "min-h-0 min-w-0 flex-1 overflow-y-auto",
+                view !== "characters" && "hidden"
+              )}
+            >
+              <CharacterGrid
+                characters={characters}
+                added={added}
+                onRemove={handleRemove}
+              />
+            </div>
+            <div className={cn(view !== "characters" && "hidden")}>
+              <TrainingDialog characters={characters} />
+            </div>
+            <div
+              className={cn(
+                "min-h-0 min-w-0 flex-1 overflow-y-auto",
+                view !== "summary" && "hidden"
+              )}
+            >
+              <Summary characters={characters} added={added} />
+            </div>
           </div>
-          <div className={cn(view !== "characters" && "hidden")}>
-            <TrainingDialog characters={characters} />
-          </div>
-          <div
-            className={cn(
-              "min-h-0 min-w-0 flex-1 overflow-y-auto",
-              view !== "summary" && "hidden"
-            )}
-          >
-            <Summary characters={characters} added={added} />
-          </div>
-        </div>
 
-        <AddCharacterDialog characters={characters} />
+          <AddCharacterDialog characters={characters} />
+        </div>
       </div>
-    </div>
     </ErrorBoundary>
   )
 }
