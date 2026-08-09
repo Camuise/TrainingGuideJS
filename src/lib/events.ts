@@ -3,6 +3,28 @@ export const CHARACTERS_ADDED_EVENT = "characters:added"
 export const TRAINING_OPEN_EVENT = "training:open"
 export const TRAINING_CLOSE_EVENT = "training:close"
 export const TRAINING_PLANS_CHANGED_EVENT = "training-plans:changed"
+export const VIEW_CHANGE_EVENT = "view:change"
+export const COMMAND_MENU_OPEN_EVENT = "command-menu:open"
+
+export function dispatchCommandMenuOpen(): void {
+  window.dispatchEvent(new CustomEvent(COMMAND_MENU_OPEN_EVENT))
+}
+
+export function onCommandMenuOpen(listener: () => void): () => void {
+  window.addEventListener(COMMAND_MENU_OPEN_EVENT, listener)
+  return () => window.removeEventListener(COMMAND_MENU_OPEN_EVENT, listener)
+}
+
+export function dispatchViewChange(view: "characters" | "summary"): void {
+  window.dispatchEvent(new CustomEvent(VIEW_CHANGE_EVENT, { detail: view }))
+}
+
+export function onViewChange(listener: (view: "characters" | "summary") => void): () => void {
+  const handler = (event: Event) =>
+    listener((event as CustomEvent<"characters" | "summary">).detail)
+  window.addEventListener(VIEW_CHANGE_EVENT, handler)
+  return () => window.removeEventListener(VIEW_CHANGE_EVENT, handler)
+}
 
 export function dispatchAddDialogOpen(): void {
   window.dispatchEvent(new CustomEvent(ADD_DIALOG_OPEN_EVENT))

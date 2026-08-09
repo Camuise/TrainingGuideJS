@@ -1,4 +1,7 @@
 ---
+import { CommandDialog } from "@/components/command-menu"
+import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/toaster"
 import "@/styles/global.css"
 ---
 
@@ -78,6 +81,10 @@ import "@/styles/global.css"
     </script>
   </head>
   <body>
-    <slot />
+    <ThemeProvider client:load>
+      <slot />
+    </ThemeProvider>
+    <CommandDialog client:load />
+    <Toaster client:load />
   </body>
 </html>

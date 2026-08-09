@@ -1,16 +1,23 @@
 import { useEffect, useMemo, useState } from "react"
+import { Search } from "lucide-react"
 
 import { AddCharacterButton } from "@/components/add-character-button"
 import { AddCharacterDialog } from "@/components/add-character-dialog"
 import { CharacterGrid } from "@/components/character-grid"
+import { ErrorBoundary } from "@/components/error-boundary"
 import { Summary } from "@/components/summary"
 import { ThemeSelector } from "@/components/theme-selector"
 import { TrainingDialog } from "@/components/training-dialog"
+import { Button } from "@/components/ui/button"
 import {
   loadAddedCharacters,
   persistAddedCharacters,
 } from "@/lib/added-characters"
-import { onCharactersAdded } from "@/lib/events"
+import {
+  dispatchCommandMenuOpen,
+  onCharactersAdded,
+  onViewChange,
+} from "@/lib/events"
 import type { PlayableCharacter } from "@/lib/playable-characters"
 import { removeTrainingState } from "@/lib/training-state"
 import { cn } from "@/lib/utils"
@@ -37,6 +44,8 @@ export function AppShell({ characters }: AppShellProps) {
     persistAddedCharacters(added)
   }, [added])
 
+  useEffect(() => onViewChange(setView), [])
+
   useEffect(
     () =>
       onCharactersAdded((names) => {
@@ -57,33 +66,44 @@ export function AppShell({ characters }: AppShellProps) {
   }
 
   return (
-    <div className="flex h-svh overflow-hidden p-6">
-      <div className="flex min-h-0 w-full flex-col gap-4 text-sm leading-loose">
-        <header className="flex shrink-0 flex-wrap items-center justify-between gap-3">
-          <h1 className="text-4xl font-bold">Training Guide Dashboard</h1>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-0.5 border border-border bg-muted p-0.5">
-              {VIEWS.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  aria-pressed={view === item}
-                  onClick={() => setView(item)}
-                  className={cn(
-                    "h-7 px-3 text-xs font-medium capitalize transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
-                    view === item
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:bg-background hover:text-foreground"
-                  )}
-                >
-                  {item}
-                </button>
-              ))}
+    <ErrorBoundary>
+      <div className="flex h-svh overflow-hidden p-6">
+        <div className="flex min-h-0 w-full flex-col gap-4 text-sm leading-loose">
+          <header className="flex shrink-0 flex-wrap items-center justify-between gap-3">
+            <h1 className="text-4xl font-bold">Training Guide Dashboard</h1>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon-lg"
+                aria-label="Search and navigate"
+                onClick={() => dispatchCommandMenuOpen()}
+              >
+                <Search className="size-5" />
+              </Button>
+              <div className="flex items-center gap-0.5 border border-border bg-muted p-0.5">
+                {VIEWS.map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    aria-label={`Switch to ${item} view`}
+                    aria-pressed={view === item}
+                    onClick={() => setView(item)}
+                    className={cn(
+                      "h-7 px-3 text-xs font-medium capitalize transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+                      view === item
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-background hover:text-foreground"
+                    )}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+              <ThemeSelector />
+              <AddCharacterButton />
             </div>
-            <ThemeSelector />
-            <AddCharacterButton />
-          </div>
-        </header>
+          </header>
 
         <div className="flex min-h-0 flex-1 items-stretch">
           <div
@@ -114,5 +134,6 @@ export function AppShell({ characters }: AppShellProps) {
         <AddCharacterDialog characters={characters} />
       </div>
     </div>
+    </ErrorBoundary>
   )
 }
