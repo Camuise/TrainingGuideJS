@@ -1,0 +1,22 @@
+---
+import Layout from "@/layouts/main.astro"
+---
+
+<Layout>
+  <main class="flex h-svh flex-col items-center justify-center gap-6 p-6 text-center">
+    <p class="font-heading text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+      404
+    </p>
+    <h1 class="font-heading text-4xl font-bold">Page not found</h1>
+    <p class="max-w-md text-sm/relaxed text-muted-foreground">
+      The page you&apos;re looking for doesn&apos;t exist or was moved. Your
+      training plans are untouched.
+    </p>
+    <a
+      href="/"
+      class="inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-none border border-border bg-background px-2.5 text-xs font-medium whitespace-nowrap transition-all outline-none select-none hover:bg-muted hover:text-foreground focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px"
+    >
+      Back to dashboard
+    </a>
+  </main>
+</Layout>
