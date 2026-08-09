@@ -73,7 +73,7 @@ export function ThemeSelector() {
                 setTheme(value)
               }}
             >
-              <Icon className="size-4" />
+              <Icon className="size-4" data-icon="inline-start" />
               {label}
             </Button>
           ))}

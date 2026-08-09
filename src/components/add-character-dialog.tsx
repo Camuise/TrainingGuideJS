@@ -95,6 +95,7 @@ export function AddCharacterDialog({ characters }: AddCharacterDialogProps) {
           <input
             ref={searchInputRef}
             type="search"
+            aria-label="Search characters"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search characters..."
@@ -131,6 +132,7 @@ export function AddCharacterDialog({ characters }: AddCharacterDialogProps) {
                         character.assetIcon,
                       ]}
                       alt={character.name}
+                      data-icon="inline-start"
                       className="size-24"
                     />
                     <span className="line-clamp-2 w-full text-center text-xs leading-tight">

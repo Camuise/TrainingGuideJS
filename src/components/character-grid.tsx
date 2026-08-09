@@ -103,6 +103,7 @@ export function CharacterGrid({
                     src={character.icon}
                     fallbackSrcs={[character.fallbackIcon, character.assetIcon]}
                     alt={character.name}
+                    data-icon="inline-start"
                     className="size-28"
                   />
                   <span className="flex items-center gap-1.5 text-center text-xs font-medium">
@@ -154,7 +155,7 @@ export function CharacterGrid({
               Cancel
             </Button>
             <Button type="button" variant="destructive" onClick={confirmDelete}>
-              <Trash2 className="size-4" />
+              <Trash2 className="size-4" data-icon="inline-start" />
               Remove
             </Button>
           </DialogFooter>

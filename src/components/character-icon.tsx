@@ -7,6 +7,7 @@ interface CharacterIconProps {
   fallbackSrcs: string[]
   alt: string
   className?: string
+  "data-icon"?: "inline-start" | "inline-end"
 }
 
 export function CharacterIcon({
@@ -14,6 +15,7 @@ export function CharacterIcon({
   fallbackSrcs,
   alt,
   className,
+  "data-icon": dataIcon,
 }: CharacterIconProps) {
   const sources = [src, ...fallbackSrcs].filter(Boolean)
   const [index, setIndex] = useState(0)
@@ -23,6 +25,7 @@ export function CharacterIcon({
     <img
       src={currentSrc}
       alt={alt}
+      data-icon={dataIcon}
       loading="lazy"
       onError={() => {
         if (index < sources.length - 1) setIndex(index + 1)
