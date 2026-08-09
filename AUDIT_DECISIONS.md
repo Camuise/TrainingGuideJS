@@ -16,7 +16,7 @@ Foundation 20/20, Interaction 11/20, States 20/20, Accessibility 20/20, Producti
 | `forms-have-labels` | verify | **Waive** | All form controls use `aria-label` (e.g., search inputs: "Search characters"). Labels resolve at runtime. |
 | `icon-buttons-have-labels` | verify | **Waive** | Every icon button carries an `aria-label` ("Search and navigate", "Open theme selector", "Add character", "Remove <name>", …). Verified at runtime. |
 | `images-have-alt` | verify | **Waive** | Character portraits use `alt={character.name}`; decorative 16px element icons use intentional `alt=""` (name text is adjacent). |
-| `pointer-target-size-passes` | verify | **Implement** | `icon-lg` button size bumped `size-9` → `size-11` (36px → 44px), covering search, theme, add-character, and card remove buttons. Text controls remain ≥ 24px. |
+| `pointer-target-size-passes` | verify | **Implement** | `icon-lg` button size bumped `size-9` → `size-11` (36px → 44px), covering search, theme, add-character, and card remove buttons; the characters/summary view-toggle buttons match at `h-11` (44px) with the segmented container's padding removed so the group reads the same height as the icon buttons. All pointer targets are ≥ 44px. |
 | `mobile-overflow-absent` | verify | **Waive (manual)** | Not verifiable in the automation viewport (locked at 1280px). Layout uses the responsive app-shell container with `overflow-y-auto` content columns; recommend a manual 320px check before release. |
 
 ## Intentional tool-gap note

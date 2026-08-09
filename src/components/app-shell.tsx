@@ -81,7 +81,7 @@ export function AppShell({ characters }: AppShellProps) {
               >
                 <Search className="size-5" />
               </Button>
-              <div className="flex items-center gap-0.5 border border-border bg-muted p-0.5">
+              <div className="flex items-center gap-0.5 border border-border bg-muted">
                 {VIEWS.map((item) => (
                   <button
                     key={item}
@@ -90,7 +90,7 @@ export function AppShell({ characters }: AppShellProps) {
                     aria-pressed={view === item}
                     onClick={() => setView(item)}
                     className={cn(
-                      "h-7 px-3 text-xs font-medium capitalize transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+                      "h-11 px-3 text-xs font-medium capitalize transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
                       view === item
                         ? "bg-primary text-primary-foreground"
                         : "text-muted-foreground hover:bg-background hover:text-foreground"
