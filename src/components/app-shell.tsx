@@ -121,14 +121,11 @@ export function AppShell({ characters }: AppShellProps) {
             <div className={cn(view !== "characters" && "hidden")}>
               <TrainingDialog characters={characters} />
             </div>
-            <div
-              className={cn(
-                "min-h-0 min-w-0 flex-1 overflow-y-auto",
-                view !== "summary" && "hidden"
-              )}
-            >
-              <Summary characters={characters} added={added} />
-            </div>
+            {view === "summary" && (
+              <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
+                <Summary characters={characters} added={added} />
+              </div>
+            )}
           </div>
 
           <AddCharacterDialog characters={characters} />
